@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TierGoat — NBA All-Time Ranker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080808;--s1:#111;--s2:#181818;--s3:#222;--b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.14);--b3:rgba(255,255,255,.22);--tx:#efefef;--mu:#5a5a5a;--mu2:#888;--ac:#e8c84a;--ac2:#c4a832;--red:#e85a4a;--green:#4acd8d;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;}
+.app{min-height:100vh;display:flex;flex-direction:column;}
+
+/* HEADER */
+.hdr{padding:16px 24px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:14px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--ac);}
+.logo-dot{color:var(--tx);opacity:.3;}
+.hdr-sub{font-size:11px;color:var(--mu);letter-spacing:.06em;text-transform:uppercase;}
+
+/* STEPS */
+.steps{display:flex;border-bottom:1px solid var(--b1);overflow-x:auto;}
+.step{flex:1;min-width:0;padding:9px 6px;text-align:center;font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--mu);border-right:1px solid var(--b1);white-space:nowrap;transition:color .2s,background .2s;}
+.step:last-child{border-right:none;}
+.step.done{color:var(--ac2);}
+.step.done::before{content:'\2713\00a0';}
+.step.active{color:var(--ac);background:rgba(232,200,74,.05);}
+.step[onclick]:hover{color:var(--tx);background:var(--s2);}
+
+/* MAIN */
+.main{flex:1;max-width:580px;margin:0 auto;width:100%;padding:28px 20px 48px;}
+.screen{display:none;flex-direction:column;}
+.screen.active{display:flex;}
+
+/* HOME */
+.h-title{font-family:'Bebas Neue',sans-serif;font-size:54px;line-height:.95;letter-spacing:3px;margin-bottom:10px;}
+.h-title em{color:var(--ac);font-style:normal;}
+.h-desc{font-size:13px;color:var(--mu2);line-height:1.75;margin-bottom:28px;max-width:400px;}
+.pos-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:28px;}
+.pos-pip{background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:12px 4px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--mu);}
+.pos-start-row{display:flex;align-items:center;gap:14px;padding:13px 16px;background:var(--s1);border:1px solid var(--b1);border-radius:10px;cursor:pointer;transition:border-color .12s,background .12s;}
+.pos-start-row:hover{border-color:var(--b2);background:var(--s2);}
+.pos-start-abbr{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--ac);min-width:28px;}
+.pos-start-name{font-size:13px;color:var(--tx);flex:1;}
+.pos-start-arr{font-size:14px;color:var(--mu);}
+.pos-start-row.done-pos .pos-start-arr::before{content:'¹30';color:var(--ac2);font-size:12px;}
+.pos-start-row.done-pos .pos-start-arr{color:var(--ac2);}
+
+/* QUIZ */
+.q-lbl{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--ac);margin-bottom:2px;}
+.q-prog-row{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:6px;}
+.pbar{height:2px;background:var(--s3);border-radius:1px;overflow:hidden;margin-bottom:16px;}
+.pfill{height:100%;background:var(--ac);border-radius:1px;transition:width .22s;}
+.q-hint{font-size:12px;color:var(--mu2);margin-bottom:16px;min-height:30px;line-height:1.55;}
+
+.vs{display:flex;gap:8px;margin-bottom:10px;}
+.vc{flex:1;background:var(--s1);border:1px solid var(--b2);border-radius:12px;padding:20px 14px;cursor:pointer;text-align:center;transition:border-color .12s,background .12s,transform .1s;position:relative;overflow:hidden;}
+.vc::after{content:'';position:absolute;inset:0;background:var(--ac);opacity:0;transition:opacity .12s;}
+.vc:hover{border-color:var(--ac);background:var(--s2);}
+.vc:hover::after{opacity:.04;}
+.vc:active{transform:scale(.97);}
+.vc-name{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:1px;color:var(--tx);margin-bottom:3px;position:relative;}
+.vc-detail{font-size:11px;color:var(--mu);position:relative;line-height:1.4;}
+.vs-sep{display:flex;align-items:center;justify-content:center;width:24px;flex-shrink:0;font-size:11px;color:var(--mu);font-weight:500;}
+
+/* COMPARE MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:100;align-items:center;justify-content:center;padding:16px;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--b2);border-radius:14px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-hdr{padding:16px 18px 14px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--ac);}
+.modal-close{background:none;border:none;color:var(--mu);font-size:20px;cursor:pointer;line-height:1;padding:4px;}
+.modal-close:hover{color:var(--tx);}
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--b1);}
+.cmp-col{padding:14px 16px;}
+.cmp-col+.cmp-col{border-left:1px solid var(--b1);}
+.cmp-pname{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.5px;color:var(--tx);margin-bottom:2px;}
+.cmp-era{font-size:11px;color:var(--mu);margin-bottom:10px;}
+.stat-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--b1);}
+.stat-row:last-child{border-bottom:none;}
+.stat-lbl{color:var(--mu2);}
+.stat-val{font-weight:500;color:var(--tx);}
+.stat-val.hi{color:var(--green);}
+.accolades-sec{padding:12px 16px;border-bottom:1px solid var(--b1);}
+.acc-title{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.acc-tag{display:inline-block;font-size:11px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;padding:2px 7px;margin:2px 2px 0 0;color:var(--mu2);}
+
+/* SELECT */
+.sel-t{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:2px;color:var(--ac);margin-bottom:5px;}
+.sel-d{font-size:13px;color:var(--mu2);line-height:1.65;margin-bottom:20px;}
+.sel-wrap{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.sel-card{background:var(--s1);border:1px solid var(--b1);border-radius:10px;overflow:hidden;}
+.sel-card-hdr{padding:10px 14px 8px;background:rgba(232,200,74,.04);border-bottom:1px solid var(--b1);display:flex;align-items:baseline;gap:8px;}
+.sel-abbr{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--ac);}
+.sel-fullname{font-size:11px;color:var(--mu);}
+.sel-ranked{padding:8px 14px 6px;border-bottom:1px solid var(--b1);}
+.sel-r-row{display:flex;align-items:center;gap:6px;padding:3px 0;}
+.sel-r-num{font-size:11px;color:var(--mu);min-width:18px;text-align:right;}
+.sel-r-name{font-size:12px;color:var(--tx);}
+.sel-footer{padding:10px 14px;display:flex;align-items:center;gap:8px;}
+.sel-count-lbl{font-size:11px;color:var(--mu);flex:1;}
+.sel-num{font-size:16px;font-weight:500;min-width:22px;text-align:center;color:var(--tx);}
+.sel-btn{width:26px;height:22px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;color:var(--tx);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.sel-btn:hover{background:var(--b2);}
+.sel-total{font-size:13px;color:var(--mu);margin-bottom:14px;}
+.sel-total span{color:var(--ac);font-weight:500;}
+
+/* MID / RESULTS */
+.rcard{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;margin-bottom:14px;}
+.rcard-hdr{padding:12px 16px;background:rgba(232,200,74,.04);border-bottom:1px solid var(--b1);display:flex;align-items:baseline;gap:8px;}
+.rch-abbr{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--ac);}
+.rch-name{font-size:12px;color:var(--mu);}
+.r-row{display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid var(--b1);}
+.r-row:last-child{border-bottom:none;}
+.r-num{font-size:11px;color:var(--mu);min-width:20px;text-align:right;font-weight:500;}
+.r-name{font-size:13px;color:var(--tx);flex:1;}
+.r-era{font-size:11px;color:var(--mu);}
+
+/* TOP 50 RESULT */
+.t50-title{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;color:var(--ac);margin-bottom:3px;}
+.t50-meta{font-size:12px;color:var(--mu);margin-bottom:18px;}
+.t50-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b1);}
+.t50-row:last-child{border-bottom:none;}
+.t50-n{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--mu);min-width:34px;text-align:right;line-height:1;}
+.t50-n.gold{color:var(--ac);}
+.t50-name{font-size:14px;color:var(--tx);flex:1;}
+.t50-pos{font-size:10px;color:var(--mu);background:var(--s2);padding:2px 6px;border-radius:4px;letter-spacing:.04em;}
+
+/* BUTTONS */
+.btn{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,transform .1s;font-family:'DM Sans',sans-serif;}
+.btn:active{transform:scale(.98);}
+.btn-p{background:var(--ac);color:#000;}
+.btn-p:hover{opacity:.88;}
+.btn-g{background:transparent;color:var(--mu2);border:1px solid var(--b2);}
+.btn-g:hover{color:var(--tx);background:var(--s2);}
+.btn-sm{padding:7px 14px;font-size:11px;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+.cmp-btn{background:var(--s2);border:1px solid var(--b2);color:var(--mu2);border-radius:6px;padding:5px 11px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:color .12s,border-color .12s;}
+.cmp-btn:hover{color:var(--tx);border-color:var(--b3);}
+.mid-divider{height:1px;background:var(--b1);margin:18px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr" style="justify-content:space-between;">
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+  <ellipse cx="14" cy="16" rx="8" ry="7" fill="#e8c84a" opacity=".15"/>
+  <ellipse cx="14" cy="15.5" rx="6.5" ry="5.5" fill="#e8c84a" opacity=".25"/>
+  <!-- body -->
+  <ellipse cx="14" cy="17" rx="5.5" ry="4.5" fill="#e8c84a"/>
+  <!-- head -->
+  <ellipse cx="14" cy="10.5" rx="4" ry="3.5" fill="#e8c84a"/>
+  <!-- horns -->
+  <path d="M11 8 Q9.5 4.5 8 5.5" stroke="#e8c84a" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  <path d="M17 8 Q18.5 4.5 20 5.5" stroke="#e8c84a" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+  <!-- ear -->
+  <ellipse cx="10.5" cy="9.5" rx="1.2" ry="1.8" fill="#e8c84a" transform="rotate(-20 10.5 9.5)"/>
+  <ellipse cx="17.5" cy="9.5" rx="1.2" ry="1.8" fill="#e8c84a" transform="rotate(20 17.5 9.5)"/>
+  <!-- legs -->
+  <rect x="10" y="20.5" width="2" height="4.5" rx="1" fill="#e8c84a"/>
+  <rect x="16" y="20.5" width="2" height="4.5" rx="1" fill="#e8c84a"/>
+  <!-- eye -->
+  <circle cx="12.5" cy="10" r="0.8" fill="#0a0a0a"/>
+  <circle cx="15.5" cy="10" r="0.8" fill="#0a0a0a"/>
+  <!-- beard -->
+  <path d="M13 13.5 Q14 15 15 13.5" stroke="#c4a832" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+</svg>
+<div class="logo">Tier<span class="logo-dot">.</span>Goat</div>
+  <div class="hdr-sub">NBA All-Time Ranker</div>
+  <a href="index.html" style="font-size:11px;color:var(--mu);text-decoration:none;letter-spacing:.04em;opacity:.7;">&#8592; All Rankers</a>
+</div>
+<div class="steps">
+  <div class="step" id="stp-pg" onclick="jumpToPos(0)" style="cursor:pointer" title="Point Guards">PG</div>
+  <div class="step" id="stp-sg" onclick="jumpToPos(1)" style="cursor:pointer" title="Shooting Guards">SG</div>
+  <div class="step" id="stp-sf" onclick="jumpToPos(2)" style="cursor:pointer" title="Small Forwards">SF</div>
+  <div class="step" id="stp-pf" onclick="jumpToPos(3)" style="cursor:pointer" title="Power Forwards">PF</div>
+  <div class="step" id="stp-c"  onclick="jumpToPos(4)" style="cursor:pointer" title="Centers">C</div>
+  <div class="step" id="stp-sel">Pool</div>
+  <div class="step" id="stp-top">Top 50</div>
+  <div class="step" id="stp-fin">Results</div>
+</div>
+<div class="main">
+
+<!-- HOME -->
+<div class="screen active" id="s-home">
+  <div class="h-title">Rank the<br><em>Greatest</em><br>of All Time</div>
+  <p class="h-desc">Head-to-head matchups at each position, then your personal top 50. Every question is one the algorithm actually needs — no filler, no ratings.</p>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px" id="home-pos-list">
+    <div class="pos-start-row" onclick="startPos(0)"><span class="pos-start-abbr">PG</span><span class="pos-start-name">Point Guards</span><span class="pos-start-arr">&#8594;</span></div>
+    <div class="pos-start-row" onclick="startPos(1)"><span class="pos-start-abbr">SG</span><span class="pos-start-name">Shooting Guards</span><span class="pos-start-arr">&#8594;</span></div>
+    <div class="pos-start-row" onclick="startPos(2)"><span class="pos-start-abbr">SF</span><span class="pos-start-name">Small Forwards</span><span class="pos-start-arr">&#8594;</span></div>
+    <div class="pos-start-row" onclick="startPos(3)"><span class="pos-start-abbr">PF</span><span class="pos-start-name">Power Forwards</span><span class="pos-start-arr">&#8594;</span></div>
+    <div class="pos-start-row" onclick="startPos(4)"><span class="pos-start-abbr">C</span><span class="pos-start-name">Centers</span><span class="pos-start-arr">&#8594;</span></div>
+  </div>
+  <p style="font-size:11px;color:var(--mu);line-height:1.6">Rank all 5 positions to unlock the Top 50 builder. Or jump straight to any position.</p>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="s-quiz">
+  <div class="q-lbl" id="qlbl"></div>
+  <div class="q-prog-row"><span id="qnum" style="color:var(--mu)">Question 1</span></div>
+  <div class="pbar"><div class="pfill" id="qpf" style="width:0%"></div></div>
+  <div class="q-hint" id="qhint"></div>
+  <div class="vs">
+    <div class="vc" id="vca" onclick="pick('hi')">
+      <div class="vc-name" id="vna">—</div>
+      <div class="vc-detail" id="vda">—</div>
+    </div>
+    <div class="vs-sep">vs</div>
+    <div class="vc" id="vcb" onclick="pick('lo')">
+      <div class="vc-name" id="vnb">—</div>
+      <div class="vc-detail" id="vdb">—</div>
+    </div>
+  </div>
+  <div class="btn-row" style="margin-bottom:8px;gap:6px;flex-wrap:wrap">
+    <button class="cmp-btn" onclick="openCompare()">Compare Stats</button>
+    <button class="cmp-btn" id="bs-undo-btn" style="display:none" onclick="undoPick()">&#8592; Undo</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-g btn-sm" onclick="showMid()">See ranking so far</button>
+  </div>
+</div>
+
+<!-- MID -->
+<div class="screen" id="s-mid">
+  <div class="q-lbl" id="mid-lbl"></div>
+  <p style="font-size:12px;color:var(--mu2);margin-bottom:14px" id="mid-desc"></p>
+  <div id="mid-list"></div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn btn-p" onclick="resumeQuiz()" id="mid-resume">Keep going</button>
+    <button class="btn btn-g" onclick="useCurrentRanking()">Use this ranking</button>
+  </div>
+</div>
+
+<!-- SELECT -->
+<div class="screen" id="s-sel">
+  <div class="sel-t">Build Your Pool</div>
+  <div class="sel-d">Choose how many players from each position carry into your top-50. Use +/− to adjust. Your position rankings are shown to help you decide. Total must equal 50.</div>
+  <div class="sel-wrap" id="sel-wrap"></div>
+  <div class="sel-total">Total: <span id="sel-tot">50</span> / 50</div>
+  <div class="btn-row"><button class="btn btn-p" id="sel-go" onclick="startTop50()">Rank My Top 50</button></div>
+</div>
+
+<!-- TOP 50 QUIZ -->
+<div class="screen" id="s-top50">
+  <div class="q-lbl" style="font-size:26px">Top 50 — All Time</div>
+  <div class="q-prog-row"><span id="t50num" style="color:var(--mu)">Question 1</span></div>
+  <div class="pbar"><div class="pfill" id="t50pf" style="width:0%"></div></div>
+  <div class="q-hint" id="t50hint"></div>
+  <div class="vs">
+    <div class="vc" onclick="t50pick('hi')">
+      <div class="vc-name" id="t50na">—</div>
+      <div class="vc-detail" id="t50da">—</div>
+    </div>
+    <div class="vs-sep">vs</div>
+    <div class="vc" onclick="t50pick('lo')">
+      <div class="vc-name" id="t50nb">—</div>
+      <div class="vc-detail" id="t50db">—</div>
+    </div>
+  </div>
+  <div class="btn-row" style="margin-bottom:8px;gap:6px;flex-wrap:wrap">
+    <button class="cmp-btn" onclick="openCompareT50()">Compare Stats</button>
+    <button class="cmp-btn" id="t50-undo-btn" style="display:none" onclick="undoT50Pick()">&#8592; Undo</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-g btn-sm" onclick="showT50Partial()">See ranking so far</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="s-res">
+  <div class="t50-title">Your Top 50</div>
+  <div class="t50-meta" id="res-meta"></div>
+  <div id="t50-list"></div>
+  <div class="mid-divider"></div>
+  <div class="q-lbl" style="font-size:24px;margin-bottom:14px">By Position</div>
+  <div id="pos-res"></div>
+  <div class="btn-row" style="margin-top:18px">
+    <button class="btn btn-g" onclick="location.reload()">Start Over</button>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- COMPARE MODAL -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">Player Comparison</div>
+      <button class="modal-close" onclick="closeCompare()">&#215;</button>
+    </div>
+    <div class="cmp-grid" id="cmp-grid"></div>
+    <div id="cmp-acc-a" class="accolades-sec"></div>
+    <div id="cmp-acc-b" class="accolades-sec" style="border-top:1px solid var(--b1)"></div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const POS=[
+  {key:'pg',label:'Point Guards',abbr:'PG'},
+  {key:'sg',label:'Shooting Guards',abbr:'SG'},
+  {key:'sf',label:'Small Forwards',abbr:'SF'},
+  {key:'pf',label:'Power Forwards',abbr:'PF'},
+  {key:'c',label:'Centers',abbr:'C'},
+];
+
+const DB={
+pg:[
+  {n:'Magic Johnson',e:'1979–1996',s:{ppg:19.5,rpg:7.2,apg:11.2,spg:1.9,bpg:0.4},ac:['5× NBA Champion','3× MVP','3× Finals MVP','12× All-Star','9× All-NBA','Hall of Fame']},
+  {n:'Oscar Robertson',e:'1960–1974',s:{ppg:25.7,rpg:7.5,apg:9.5,spg:null,bpg:null},ac:['NBA Champion (1971)','MVP (1964)','12× All-Star','11× All-NBA','ROY 1961','Hall of Fame']},
+  {n:'John Stockton',e:'1984–2003',s:{ppg:13.1,rpg:2.7,apg:10.5,spg:2.2,bpg:0.2},ac:['All-time assists leader (15,806)','All-time steals leader','10× All-Star','9× All-NBA','2× Finals appearance','Hall of Fame']},
+  {n:'Stephen Curry',e:'2009–present',s:{ppg:24.8,rpg:4.7,apg:6.3,spg:1.5,bpg:0.2},ac:['4× NBA Champion','2× MVP (incl. unanimous)','1× Finals MVP','12× All-Star','11× All-NBA','All-time 3PM leader (4,225+)']},
+  {n:'Isiah Thomas',e:'1981–1994',s:{ppg:19.2,rpg:3.6,apg:9.3,spg:1.9,bpg:0.3},ac:['2× NBA Champion','Finals MVP (1990)','12× All-Star','3× All-NBA','Hall of Fame']},
+  {n:'Chris Paul',e:'2005–present',s:{ppg:18.5,rpg:4.5,apg:9.4,spg:2.1,bpg:0.2},ac:['ROY (2006)','12× All-Star','12× All-Defensive 1st','6× All-NBA','NBA Champion (2024)']},
+  {n:'Gary Payton',e:'1990–2007',s:{ppg:16.3,rpg:4.3,apg:6.7,spg:1.8,bpg:0.2},ac:['NBA Champion (2006)','DPOY (1996)','9× All-Star','9× All-Defensive 1st','2× All-NBA','Hall of Fame']},
+  {n:'Jason Kidd',e:'1994–2013',s:{ppg:12.6,rpg:6.3,apg:8.7,spg:1.9,bpg:0.3},ac:['NBA Champion (2011)','ROY (1995)','10× All-Star','6× All-NBA','9× All-Defensive','Hall of Fame']},
+  {n:'Walt Frazier',e:'1967–1980',s:{ppg:18.9,rpg:5.9,apg:6.1,spg:null,bpg:null},ac:['2× NBA Champion','7× All-Star','4× All-NBA','7× All-Defensive 1st','Hall of Fame']},
+  {n:'Bob Cousy',e:'1950–1970',s:{ppg:18.4,rpg:5.2,apg:7.5,spg:null,bpg:null},ac:['6× NBA Champion','MVP (1957)','13× All-Star','10× All-NBA','Hall of Fame']},
+  {n:'Steve Nash',e:'1996–2015',s:{ppg:14.3,rpg:3.0,apg:8.5,spg:0.7,bpg:0.1},ac:['2× MVP','8× All-Star','5× All-NBA','Hall of Fame']},
+  {n:'Pete Maravich',e:'1970–1980',s:{ppg:24.2,rpg:4.2,apg:5.4,spg:null,bpg:null},ac:['5× All-Star','All-NBA (1976–77)','Scoring title (1976–77)','Hall of Fame']},
+  {n:'Damian Lillard',e:'2012–present',s:{ppg:25.0,rpg:4.2,apg:6.6,spg:0.9,bpg:0.3},ac:['NBA Champion (2024)','8× All-Star','3× All-NBA','ROY (2013)']},
+  {n:'Chauncey Billups',e:'1997–2014',s:{ppg:15.6,rpg:2.9,apg:5.7,spg:1.1,bpg:0.2},ac:['NBA Champion (2004)','Finals MVP (2004)','5× All-Star','Hall of Fame']},
+  {n:'Russell Westbrook',e:'2008–present',s:{ppg:22.0,rpg:7.3,apg:8.5,spg:1.6,bpg:0.3},ac:['MVP (2016–17)','3× triple-double seasons (record)','9× All-Star','5× All-NBA']},
+  {n:'Tony Parker',e:'2001–2019',s:{ppg:15.5,rpg:2.7,apg:5.6,spg:0.7,bpg:0.2},ac:['4× NBA Champion','Finals MVP (2007)','6× All-Star','3× All-NBA','Hall of Fame']},
+],
+sg:[
+  {n:'Michael Jordan',e:'1984–2003',s:{ppg:30.1,rpg:6.2,apg:5.3,spg:2.3,bpg:0.8},ac:['6× NBA Champion','6× Finals MVP','5× MVP','14× All-Star','10× scoring title','9× All-Defensive 1st','Hall of Fame']},
+  {n:'Kobe Bryant',e:'1996–2016',s:{ppg:25.0,rpg:5.2,apg:4.7,spg:1.4,bpg:0.5},ac:['5× NBA Champion','2× Finals MVP','1× MVP','18× All-Star','2× scoring title','Hall of Fame']},
+  {n:'Jerry West',e:'1960–1974',s:{ppg:27.0,rpg:5.8,apg:6.7,spg:null,bpg:null},ac:['NBA Champion (1972)','Finals MVP (1969)','14× All-Star','12× All-NBA','5× All-Defensive','Hall of Fame']},
+  {n:'Clyde Drexler',e:'1983–1998',s:{ppg:20.4,rpg:6.1,apg:5.6,spg:2.0,bpg:0.7},ac:['NBA Champion (1995)','10× All-Star','All-NBA (1992)','Hall of Fame']},
+  {n:'Reggie Miller',e:'1987–2005',s:{ppg:18.2,rpg:3.0,apg:3.0,spg:1.1,bpg:0.2},ac:['5× All-Star','All-time 3PM leader (retired)','Hall of Fame']},
+  {n:'Ray Allen',e:'1996–2014',s:{ppg:18.9,rpg:4.1,apg:3.4,spg:1.1,bpg:0.2},ac:['2× NBA Champion','10× All-Star','All-time 3PM leader (retired)','Hall of Fame']},
+  {n:'Tracy McGrady',e:'1997–2012',s:{ppg:19.6,rpg:5.6,apg:4.4,spg:1.3,bpg:0.9},ac:['2× scoring champion','7× All-Star','3× All-NBA','Hall of Fame']},
+  {n:'Manu Ginobili',e:'2002–2018',s:{ppg:13.3,rpg:3.5,apg:3.8,spg:1.3,bpg:0.3},ac:['4× NBA Champion','Finals MVP (2005)','2× All-Star','Hall of Fame']},
+  {n:'Joe Dumars',e:'1985–1999',s:{ppg:16.1,rpg:2.9,apg:4.0,spg:0.9,bpg:0.2},ac:['2× NBA Champion','Finals MVP (1989)','6× All-Star','5× All-Defensive','Hall of Fame']},
+  {n:'Allen Iverson',e:'1996–2010',s:{ppg:26.7,rpg:3.7,apg:6.2,spg:2.2,bpg:0.2},ac:['MVP (2001)','Finals appearance (2001)','4× scoring champion','11× All-Star','3× All-NBA','Hall of Fame']},
+  {n:'George Gervin',e:'1972–1986',s:{ppg:26.2,rpg:5.0,apg:2.6,spg:1.2,bpg:0.8},ac:['4× scoring champion','9× All-Star','5× All-NBA','Hall of Fame']},
+  {n:'Donovan Mitchell',e:'2017–present',s:{ppg:24.5,rpg:4.2,apg:4.8,spg:1.3,bpg:0.4},ac:['5× All-Star','2× All-NBA','ROY runner-up (2018)']},
+  {n:'Devin Booker',e:'2015–present',s:{ppg:23.5,rpg:4.4,apg:4.3,spg:0.9,bpg:0.3},ac:['Finals appearance (2021)','5× All-Star','All-NBA (2022)','Olympic gold (2024)']},
+  {n:'Vince Carter',e:'1998–2020',s:{ppg:16.7,rpg:4.3,apg:3.1,spg:1.0,bpg:0.6},ac:['ROY (1999)','8× All-Star','Slam dunk champion (2000)','Hall of Fame']},
+  {n:'Dwyane Wade',e:'2003–2019',s:{ppg:22.0,rpg:4.7,apg:5.4,spg:1.5,bpg:0.8},ac:['3× NBA Champion','Finals MVP (2006)','13× All-Star','2× All-NBA','Hall of Fame']},
+  {n:'James Harden',e:'2009–present',s:{ppg:24.8,rpg:6.6,apg:7.8,spg:1.5,bpg:0.5},ac:['MVP (2018)','NBA Champion (2024)','3× scoring champion','10× All-Star','6× All-NBA']},
+],
+sf:[
+  {n:'LeBron James',e:'2003–present',s:{ppg:26.8,rpg:7.5,apg:7.4,spg:1.5,bpg:0.7},ac:['4× NBA Champion','4× Finals MVP','4× MVP','21× All-Star','All-time scoring leader','13× All-NBA','ROY (2004)']},
+  {n:'Larry Bird',e:'1979–1992',s:{ppg:24.3,rpg:10.0,apg:6.3,spg:1.7,bpg:0.8},ac:['3× NBA Champion','Finals MVP (1984)','3× MVP (consecutive)','12× All-Star','9× All-NBA','Hall of Fame']},
+  {n:'Scottie Pippen',e:'1987–2004',s:{ppg:16.1,rpg:6.4,apg:5.2,spg:2.0,bpg:0.8},ac:['6× NBA Champion','7× All-Star','3× All-NBA','8× All-Defensive 1st','Hall of Fame']},
+  {n:'Julius Erving',e:'1971–1987',s:{ppg:24.2,rpg:8.5,apg:4.2,spg:2.0,bpg:1.7},ac:['NBA Champion (1983)','NBA MVP (1981)','ABA MVP (3×)','11× NBA All-Star','Hall of Fame']},
+  {n:'Rick Barry',e:'1965–1980',s:{ppg:24.8,rpg:6.7,apg:4.9,spg:2.0,bpg:0.4},ac:['NBA Champion (1975)','Finals MVP (1975)','8× All-Star','5× All-NBA','Hall of Fame']},
+  {n:'Elgin Baylor',e:'1958–1972',s:{ppg:27.4,rpg:13.5,apg:4.3,spg:null,bpg:null},ac:['11× All-Star','10× All-NBA','Hall of Fame']},
+  {n:'John Havlicek',e:'1962–1978',s:{ppg:20.8,rpg:6.3,apg:4.8,spg:null,bpg:null},ac:['8× NBA Champion','Finals MVP (1974)','13× All-Star','4× All-NBA','Hall of Fame']},
+  {n:'Carmelo Anthony',e:'2003–2022',s:{ppg:22.5,rpg:6.2,apg:3.0,spg:0.9,bpg:0.5},ac:['10× All-Star','2× All-NBA','Scoring champion (2013)','3× Olympic gold','Hall of Fame']},
+  {n:'Kevin Durant',e:'2007–present',s:{ppg:27.1,rpg:6.9,apg:4.4,spg:1.0,bpg:1.1},ac:['2× NBA Champion','2× Finals MVP','1× MVP (2014)','ROY (2008)','15× All-Star','8× All-NBA','Olympic gold (3×)']},
+  {n:'Kawhi Leonard',e:'2011–present',s:{ppg:19.7,rpg:6.2,apg:2.9,spg:1.7,bpg:0.6},ac:['2× NBA Champion','2× Finals MVP','6× All-Star','2× DPOY','5× All-NBA']},
+  {n:'Dominique Wilkins',e:'1982–1999',s:{ppg:24.8,rpg:6.7,apg:2.5,spg:1.3,bpg:0.5},ac:['Scoring champion (1986)','9× All-Star','2× All-NBA','Hall of Fame']},
+  {n:'James Worthy',e:'1982–1994',s:{ppg:17.6,rpg:5.1,apg:3.0,spg:1.2,bpg:0.7},ac:['3× NBA Champion','Finals MVP (1988)','7× All-Star','Hall of Fame']},
+  {n:'Paul Pierce',e:'1998–2017',s:{ppg:19.7,rpg:5.6,apg:3.5,spg:1.3,bpg:0.5},ac:['NBA Champion (2008)','Finals MVP (2008)','10× All-Star','Hall of Fame']},
+  {n:'Bernard King',e:'1977–1993',s:{ppg:22.5,rpg:5.8,apg:3.3,spg:1.2,bpg:0.4},ac:['Scoring champion (1985)','4× All-Star','All-NBA (1984–85)','Hall of Fame']},
+  {n:'Jimmy Butler',e:'2011–present',s:{ppg:19.0,rpg:5.4,apg:4.4,spg:1.6,bpg:0.5},ac:['6× All-Star','2× Finals appearance (2020, 2023)','5× All-Defensive 1st','Most Improved (2015)']},
+  {n:'Grant Hill',e:'1994–2013',s:{ppg:16.7,rpg:6.0,apg:4.4,spg:1.2,bpg:0.5},ac:['7× All-Star','All-NBA (1997)','Co-ROY (1995)','Hall of Fame']},
+],
+pf:[
+  {n:'Tim Duncan',e:'1997–2016',s:{ppg:19.0,rpg:10.8,apg:3.0,spg:0.7,bpg:2.2},ac:['5× NBA Champion','3× Finals MVP','2× MVP','15× All-Star','10× All-NBA','15× All-Defensive','Hall of Fame']},
+  {n:'Karl Malone',e:'1985–2004',s:{ppg:25.0,rpg:10.1,apg:3.6,spg:1.4,bpg:0.8},ac:['2× MVP','14× All-Star','11× All-NBA','2× Finals appearance','2nd all-time scorer','Hall of Fame']},
+  {n:'Charles Barkley',e:'1984–2000',s:{ppg:22.1,rpg:11.7,apg:3.9,spg:1.5,bpg:0.8},ac:['MVP (1993)','11× All-Star','5× All-NBA','Hall of Fame']},
+  {n:'Kevin Garnett',e:'1995–2016',s:{ppg:17.8,rpg:10.0,apg:3.7,spg:1.3,bpg:1.4},ac:['NBA Champion (2008)','MVP (2004)','DPOY (2008)','15× All-Star','9× All-NBA','12× All-Defensive','Hall of Fame']},
+  {n:'Bob Pettit',e:'1954–1965',s:{ppg:26.4,rpg:16.2,apg:3.0,spg:null,bpg:null},ac:['NBA Champion (1958)','2× MVP','11× All-Star','11× All-NBA','Hall of Fame']},
+  {n:'Giannis Antetokounmpo',e:'2013–present',s:{ppg:24.1,rpg:9.9,apg:5.0,spg:1.1,bpg:1.2},ac:['NBA Champion (2021)','Finals MVP (2021)','2× MVP','2× DPOY (2020, 2021 run-up)','Most Improved (2017)','9× All-Star','6× All-NBA']},
+  {n:'Dirk Nowitzki',e:'1998–2019',s:{ppg:20.7,rpg:7.5,apg:2.4,spg:0.8,bpg:0.8},ac:['NBA Champion (2011)','Finals MVP (2011)','MVP (2007)','14× All-Star','12× All-NBA','Hall of Fame']},
+  {n:'Elvin Hayes',e:'1968–1984',s:{ppg:21.0,rpg:12.5,apg:1.8,spg:null,bpg:1.7},ac:['NBA Champion (1978)','12× All-Star','6× All-NBA','Hall of Fame']},
+  {n:'Pau Gasol',e:'2001–2019',s:{ppg:17.0,rpg:9.2,apg:3.3,spg:0.7,bpg:1.7},ac:['2× NBA Champion','6× All-Star','ROY (2002)','All-NBA 2nd (2x)','Hall of Fame']},
+  {n:'Draymond Green',e:'2012–present',s:{ppg:8.9,rpg:7.0,apg:5.8,spg:1.4,bpg:0.9},ac:['4× NBA Champion','DPOY (2017)','3× All-Defensive 1st','4× All-Star']},
+  {n:'Chris Webber',e:'1993–2008',s:{ppg:20.7,rpg:9.8,apg:4.2,spg:1.4,bpg:1.4},ac:['5× All-Star','5× All-NBA','ROY (1994)','Hall of Fame']},
+  {n:'Anthony Davis',e:'2012–present',s:{ppg:24.1,rpg:10.4,apg:2.6,spg:1.3,bpg:2.3},ac:['NBA Champion (2020)','9× All-Star','3× All-NBA','DPOY (2018 runner-up)','Olympic gold (2024)']},
+  {n:'Chris Bosh',e:'2003–2016',s:{ppg:19.2,rpg:8.5,apg:2.0,spg:0.7,bpg:1.0},ac:['2× NBA Champion','11× All-Star','Hall of Fame']},
+  {n:"Amar'e Stoudemire",e:'2002–2016',s:{ppg:18.9,rpg:7.8,apg:1.7,spg:0.5,bpg:1.0},ac:['6× All-Star','All-NBA 2nd (2x)','ROY (2003)','Hall of Fame']},
+  {n:'Blake Griffin',e:'2010–2021',s:{ppg:19.0,rpg:7.6,apg:4.0,spg:0.7,bpg:0.5},ac:['6× All-Star','ROY (2011)','All-NBA 2nd (2x)']},
+],
+c:[
+  {n:'Kareem Abdul-Jabbar',e:'1969–1989',s:{ppg:24.6,rpg:11.2,apg:3.6,spg:0.9,bpg:2.6},ac:['6× NBA Champion','6× MVP','2× Finals MVP','19× All-Star','10× All-NBA','All-time scoring leader (retired)','Hall of Fame']},
+  {n:'Wilt Chamberlain',e:'1959–1973',s:{ppg:30.1,rpg:22.9,apg:4.4,spg:null,bpg:null},ac:['2× NBA Champion','4× MVP','7× scoring champion','13× All-Star','100-point game','Hall of Fame']},
+  {n:'Bill Russell',e:'1956–1969',s:{ppg:15.1,rpg:22.5,apg:4.3,spg:null,bpg:null},ac:['11× NBA Champion (incl. as coach)','5× MVP','12× All-Star','3× All-NBA','Hall of Fame']},
+  {n:"Shaquille O'Neal",e:'1992–2011',s:{ppg:23.7,rpg:10.9,apg:2.5,spg:0.6,bpg:2.3},ac:['4× NBA Champion','3× Finals MVP','1× MVP','15× All-Star','8× All-NBA','Hall of Fame']},
+  {n:'Hakeem Olajuwon',e:'1984–2002',s:{ppg:21.8,rpg:11.1,apg:2.5,spg:1.7,bpg:3.1},ac:['2× NBA Champion','2× Finals MVP','MVP (1994)','DPOY (2×)','12× All-Star','All-time blocks leader','Hall of Fame']},
+  {n:'Moses Malone',e:'1974–1995',s:{ppg:20.6,rpg:12.2,apg:1.4,spg:0.8,bpg:1.3},ac:['NBA Champion (1983)','Finals MVP (1983)','3× MVP','12× All-Star','6× All-NBA','Hall of Fame']},
+  {n:'David Robinson',e:'1989–2003',s:{ppg:21.1,rpg:10.6,apg:2.5,spg:1.7,bpg:3.0},ac:['2× NBA Champion','MVP (1995)','DPOY (1992)','10× All-Star','Scoring champion (1994)','Hall of Fame']},
+  {n:'Bill Walton',e:'1974–1987',s:{ppg:13.3,rpg:10.5,apg:3.4,spg:0.9,bpg:2.5},ac:['2× NBA Champion','Finals MVP (1977)','MVP (1978)','2× All-Star','Hall of Fame']},
+  {n:'Willis Reed',e:'1964–1974',s:{ppg:18.7,rpg:12.9,apg:1.8,spg:null,bpg:null},ac:['2× NBA Champion','2× Finals MVP','MVP (1970)','7× All-Star','Hall of Fame']},
+  {n:'Patrick Ewing',e:'1985–2002',s:{ppg:21.0,rpg:9.8,apg:1.9,spg:1.0,bpg:2.4},ac:['11× All-Star','All-NBA (1990)','ROY (1986)','Hall of Fame']},
+  {n:'Alonzo Mourning',e:'1992–2008',s:{ppg:17.1,rpg:8.5,apg:1.2,spg:0.8,bpg:2.8},ac:['NBA Champion (2006)','2× DPOY','7× All-Star','Hall of Fame']},
+  {n:'Dikembe Mutombo',e:'1991–2009',s:{ppg:9.8,rpg:10.3,apg:1.0,spg:0.3,bpg:2.8},ac:['4× DPOY','8× All-Star','5× All-Defensive 1st','Hall of Fame']},
+  {n:'Joel Embiid',e:'2016–present',s:{ppg:27.6,rpg:10.8,apg:3.7,spg:1.0,bpg:1.7},ac:['MVP (2023)','7× All-Star','4× All-NBA','Scoring champion (2023)','Olympic gold (2024 - France)']},
+  {n:'Nikola Jokic',e:'2015–present',s:{ppg:22.2,rpg:11.1,apg:7.5,spg:1.3,bpg:0.7},ac:['NBA Champion (2023)','Finals MVP (2023)','3× MVP','7× All-Star','7× All-NBA']},
+  {n:'Dwight Howard',e:'2004–2022',s:{ppg:15.7,rpg:11.8,apg:1.5,spg:0.8,bpg:1.8},ac:['NBA Champion (2023)','3× DPOY','8× All-Star','5× All-NBA','5× rebounding champion','Hall of Fame']},
+]};
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let pi=0,posRes={},selCts={pg:10,sg:10,sf:10,pf:10,c:10};
+let bsSorted=[],bsQ=[],bsCur=-1,bsLo=0,bsHi=0,bsQN=0,bsPL=[];
+let bsHistory=[]; // undo stack for position quiz
+let t50S=[],t50Q=[],t50Cur=-1,t50Lo=0,t50Hi=0,t50QN=0,t50Pool=[];
+let t50History=[]; // undo stack for top-50 quiz
+let midMode='resume';
+let cmpCtx='quiz'; // 'quiz' or 't50'
+
+function mxQ(n){let t=0;for(let i=2;i<=n;i++)t+=Math.ceil(Math.log2(i));return t;}
+function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function updSteps(){
+  const keys=['pg','sg','sf','pf','c','sel','top','fin'];
+  keys.forEach((k,i)=>{
+    const el=document.getElementById('stp-'+k);if(!el)return;
+    el.classList.remove('active','done');
+    if(i<pi)el.classList.add('done');
+    else if(i===pi)el.classList.add('active');
+  });
+  // Update home screen rows
+  POS.forEach((pos,i)=>{
+    const rows=document.querySelectorAll('.pos-start-row');
+    if(!rows[i])return;
+    if(posRes[pos.key]){rows[i].classList.add('done-pos');rows[i].querySelector('.pos-start-arr').textContent='✓';}
+    else{rows[i].classList.remove('done-pos');rows[i].querySelector('.pos-start-arr').textContent='→';}
+  });
+}
+
+// ── POSITION QUIZ ──────────────────────────────────────────────────────────
+function jumpToPos(idx){
+  // Allow jumping to any position tab:
+  // - If already done (in posRes), show the completed ranking with option to redo
+  // - If it's the current position, just go back to the quiz
+  // - If it's a future position, navigate straight there
+  if(posRes[POS[idx].key]){
+    // Position already completed — show result with option to redo
+    const sorted=posRes[POS[idx].key];
+    buildMid(
+      sorted,
+      POS[idx].label+' — Your Ranking',
+      `Ranked in a previous session. Tap "Redo this position" to re-rank, or "Keep going" to continue.`,
+      DB[POS[idx].key]
+    );
+    midMode='jump';
+    document.getElementById('mid-resume').textContent='Keep going →';
+    // Add redo button dynamically
+    const existing=document.getElementById('mid-redo-btn');
+    if(existing)existing.remove();
+    const btn=document.createElement('button');
+    btn.id='mid-redo-btn';btn.className='btn btn-g';
+    btn.textContent='Redo this position';
+    btn.onclick=()=>{
+      btn.remove();
+      delete posRes[POS[idx].key];
+      startPos(idx);
+    };
+    document.querySelector('#s-mid .btn-row').appendChild(btn);
+    show('s-mid');
+  } else if(idx===pi&&document.getElementById('s-quiz').classList.contains('active')){
+    // Already on this quiz — do nothing
+  } else {
+    // Jump straight to this position
+    startPos(idx);
+  }
+}
+
+function startPos(idx){
+  pi=idx;updSteps();
+  const pos=POS[idx];bsPL=DB[pos.key];
+  const ix=bsPL.map((_,i)=>i);shuf(ix);
+  bsSorted=[ix[0]];bsQ=ix.slice(1);bsCur=-1;bsQN=0;
+  bsHistory=[];
+  const _ub=document.getElementById('bs-undo-btn');if(_ub)_ub.style.display='none';
+  document.getElementById('qlbl').textContent=pos.label;
+  show('s-quiz');bsNext();
+}
+function bsNext(){
+  if(bsQ.length===0){finPos();return;}
+  bsCur=bsQ.shift();bsLo=0;bsHi=bsSorted.length;bsAsk();
+}
+function bsAsk(){
+  if(bsLo>=bsHi){bsSorted.splice(bsLo,0,bsCur);bsNext();return;}
+  const mid=Math.floor((bsLo+bsHi)/2),piv=bsSorted[mid];
+  const ins=bsPL[bsCur],pv=bsPL[piv];
+  document.getElementById('vna').textContent=ins.n;
+  document.getElementById('vda').textContent=ins.e;
+  document.getElementById('vnb').textContent=pv.n;
+  document.getElementById('vdb').textContent=pv.e;
+  bsQN++;
+  const rem=bsQ.length,pct=Math.min(97,Math.round((bsQN/mxQ(bsPL.length))*100));
+  document.getElementById('qhint').textContent=`Placing ${ins.n} — vs. #${mid+1} in your ranking. ${rem} player${rem!==1?'s':''} still to place.`;
+  document.getElementById('qnum').textContent=`Question ${bsQN}`;
+  
+  document.getElementById('qpf').style.width=pct+'%';
+}
+function pick(ch){
+  bsHistory.push({sorted:[...bsSorted],q:[...bsQ],cur:bsCur,lo:bsLo,hi:bsHi,qn:bsQN});
+  const ub=document.getElementById('bs-undo-btn');if(ub)ub.style.display='';
+  const mid=Math.floor((bsLo+bsHi)/2);
+  if(ch==='hi')bsHi=mid;else bsLo=mid+1;
+  bsAsk();
+}
+function undoPick(){
+  if(bsHistory.length===0)return;
+  const s=bsHistory.pop();
+  bsSorted=s.sorted;bsQ=s.q;bsCur=s.cur;bsLo=s.lo;bsHi=s.hi;bsQN=s.qn;
+  if(bsHistory.length===0){const ub=document.getElementById('bs-undo-btn');if(ub)ub.style.display='none';}
+  show('s-quiz');bsAsk();
+}
+function finPos(){
+  posRes[POS[pi].key]=[...bsSorted];
+  buildMid(bsSorted,POS[pi].label+' — Complete',`All ${bsSorted.length} players ranked in ${bsQN} questions.`,bsPL);
+  midMode='done';
+  document.getElementById('mid-resume').textContent=pi<4?'Next Position \u2192':'Build My Top 50 Pool';
+  show('s-mid');
+}
+function useCurrentRanking(){
+  const all=[...(bsCur>=0?[bsCur]:[]),...bsQ];
+  posRes[POS[pi].key]=[...bsSorted,...all];
+  buildMid(posRes[POS[pi].key],POS[pi].label+' — Saved',`${bsSorted.length} ranked, ${all.length} placed at bottom.`,bsPL);
+  midMode='done';
+  document.getElementById('mid-resume').textContent=pi<4?'Next Position \u2192':'Build My Top 50 Pool';
+  show('s-mid');
+}
+function showMid(){
+  buildMid(bsSorted,POS[pi].label+' — So Far',`${bsQ.length+(bsCur>=0?1:0)} still to place.`,bsPL);
+  midMode='resume';document.getElementById('mid-resume').textContent='Keep going';show('s-mid');
+}
+function resumeQuiz(){
+  // Clean up redo button if present
+  const rb=document.getElementById('mid-redo-btn');if(rb)rb.remove();
+  if(midMode==='done'){if(pi<4){pi++;updSteps();startPos(pi);}else{pi=5;updSteps();buildSel();show('s-sel');}}
+  else if(midMode==='jump'){
+    // Find first incomplete position and continue from there
+    const nextIdx=POS.findIndex(p=>!posRes[p.key]);
+    if(nextIdx===-1){pi=5;updSteps();buildSel();show('s-sel');}
+    else{pi=nextIdx;updSteps();
+      if(bsQ.length>0||bsCur>=0){show('s-quiz');bsAsk();}
+      else startPos(nextIdx);}
+  }
+  else{show('s-quiz');bsAsk();}
+}
+function buildMid(sorted,title,desc,pl){
+  document.getElementById('mid-lbl').textContent=title;
+  document.getElementById('mid-desc').textContent=desc;
+  const el=document.getElementById('mid-list');el.innerHTML='';
+  sorted.forEach((idx,rank)=>{
+    const p=pl[idx];const row=document.createElement('div');row.className='r-row';
+    row.innerHTML=`<span class="r-num">${rank+1}</span><span class="r-name">${p.n}</span><span class="r-era">${p.e}</span>`;
+    el.appendChild(row);
+  });
+}
+
+// ── SELECT ──────────────────────────────────────────────────────────────────
+function buildSel(){
+  const w=document.getElementById('sel-wrap');w.innerHTML='';
+  POS.forEach(pos=>{
+    const sorted=posRes[pos.key]||[];
+    const n=selCts[pos.key];
+    const card=document.createElement('div');card.className='sel-card';
+
+    // Build full ranked list — highlight included vs excluded players
+    let rows='';
+    sorted.forEach((idx,rank)=>{
+      const p=DB[pos.key][idx];
+      const included=rank<n;
+      const dimStyle=included?'':'opacity:.35';
+      rows+=`<div class="sel-r-row" style="${dimStyle}">` +
+        `<span class="sel-r-num" style="${included?'color:var(--ac)':''}">${rank+1}</span>` +
+        `<span class="sel-r-name">${p.n}</span>` +
+        (included?`<span style="font-size:10px;color:var(--ac);margin-left:auto;padding-right:4px">&#10003;</span>`:``) +
+      `</div>`;
+    });
+
+    card.innerHTML=`
+      <div class="sel-card-hdr" style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span class="sel-abbr">${pos.abbr}</span>
+          <span class="sel-fullname">${pos.label}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="sel-btn" onclick="adjSel('${pos.key}',-1)">&#8722;</button>
+          <span class="sel-num" id="sc-${pos.key}">${n}</span>
+          <button class="sel-btn" onclick="adjSel('${pos.key}',1)">+</button>
+        </div>
+      </div>
+      <div class="sel-ranked" id="sr-${pos.key}">${rows}</div>`;
+    w.appendChild(card);
+  });
+  updSelTot();
+}
+function adjSel(key,d){
+  const max=DB[key].length;
+  const nv=Math.max(0,Math.min(max,selCts[key]+d));
+  const tot=Object.values(selCts).reduce((a,b)=>a+b,0)-selCts[key]+nv;
+  if(tot>50)return;
+  selCts[key]=nv;
+  document.getElementById('sc-'+key).textContent=nv;
+  // Re-render list highlights for this position
+  const sorted=posRes[key]||[];
+  let rows='';
+  sorted.forEach((idx,rank)=>{
+    const p=DB[key][idx];
+    const included=rank<nv;
+    const dimStyle=included?'':'opacity:.35';
+    rows+=`<div class="sel-r-row" style="${dimStyle}">` +
+      `<span class="sel-r-num" style="${included?'color:var(--ac)':''}">${rank+1}</span>` +
+      `<span class="sel-r-name">${p.n}</span>` +
+      (included?`<span style="font-size:10px;color:var(--ac);margin-left:auto;padding-right:4px">&#10003;</span>`:``) +
+    `</div>`;
+  });
+  const el=document.getElementById('sr-'+key);
+  if(el)el.innerHTML=rows;
+  updSelTot();
+}
+function updSelTot(){
+  const tot=Object.values(selCts).reduce((a,b)=>a+b,0);
+  document.getElementById('sel-tot').textContent=tot;
+  document.getElementById('sel-tot').style.color=tot===50?'var(--ac)':'var(--red)';
+  document.getElementById('sel-go').disabled=tot!==50;
+}
+
+// ── TOP 50 QUIZ — merge sort ──────────────────────────────────────────────
+// Merge sort asks only comparisons that are strictly necessary to determine order.
+// For 50 players: ~100–130 questions vs 150–280 for insertion sort.
+// We seed each position's players as pre-sorted runs, so the first pass of
+// merging is entirely cross-position (e.g. your #1 PG vs your #1 SG),
+// which are exactly the interesting comparisons anyway.
+
+let msRuns=[], msNextRuns=[], msMerging=null, msPairIdx=0;
+
+function startTop50(){
+  pi=6;updSteps();
+  // Build one pre-sorted run per position (already ranked by user)
+  const runs=POS.map(pos=>{
+    const n=selCts[pos.key];
+    return (posRes[pos.key]||[]).slice(0,n).map((idx,i)=>({
+      ...DB[pos.key][idx],pos:pos.abbr,posRank:i+1,posTotal:n
+    }));
+  }).filter(r=>r.length>0);
+
+  msRuns=runs;msNextRuns=[];msMerging=null;msPairIdx=0;
+  t50Pool=[];msRuns.forEach(r=>t50Pool.push(...r));
+  // Re-index pool so each player has a stable poolIdx
+  t50Pool.forEach((p,i)=>p.poolIdx=i);
+  // Re-express runs as index arrays into t50Pool
+  let offset=0;
+  msRuns=runs.map(r=>{
+    const idxArr=r.map((_,i)=>offset+i);
+    offset+=r.length;
+    return idxArr;
+  });
+
+  t50S=[];t50QN=0;t50History=[];
+  const _ub=document.getElementById('t50-undo-btn');if(_ub)_ub.style.display='none';
+  show('s-top50');msAskNext();
+}
+
+function msAskNext(){
+  // Advance merge sort state machine until we need a human comparison or we're done
+  while(true){
+    if(msMerging){
+      const m=msMerging;
+      if(m.li<m.L.length && m.ri<m.R.length){
+        // Need comparison between L[li] and R[ri]
+        const pa=t50Pool[m.L[m.li]], pb=t50Pool[m.R[m.ri]];
+        document.getElementById('t50na').textContent=pa.n;
+        document.getElementById('t50da').textContent=`${pa.pos} · ${pa.e}`;
+        document.getElementById('t50nb').textContent=pb.n;
+        document.getElementById('t50db').textContent=`${pb.pos} · ${pb.e}`;
+        t50QN++;
+        // Estimate total: N*log2(N)/2 for merge sort average
+        const est=Math.ceil(t50Pool.length*Math.log2(t50Pool.length)*0.6);
+        const pct=Math.min(97,Math.round((t50QN/est)*100));
+        const totalLeft=msRuns.length+msNextRuns.length+(msMerging?1:0)-1;
+        document.getElementById('t50hint').textContent=
+          `${pa.n} (${pa.pos}) vs ${pb.n} (${pb.pos}) — ${totalLeft} merge${totalLeft!==1?'s':''} remaining.`;
+        document.getElementById('t50num').textContent=`Question ${t50QN}`;
+        
+        document.getElementById('t50pf').style.width=pct+'%';
+        return; // wait for user
+      } else {
+        // Flush remainder of whichever side is left
+        while(m.li<m.L.length) m.buf.push(m.L[m.li++]);
+        while(m.ri<m.R.length) m.buf.push(m.R[m.ri++]);
+        msNextRuns.push(m.buf);
+        msMerging=null;
+        msPairIdx++;
+      }
+    }
+    // Start next pair
+    if(msPairIdx*2 < msRuns.length){
+      const L=msRuns[msPairIdx*2];
+      const R=msRuns[msPairIdx*2+1];
+      if(!R){ msNextRuns.push(L); msPairIdx++; continue; }
+      msMerging={L,R,li:0,ri:0,buf:[]};
+      continue;
+    }
+    // Finished a full pass
+    msRuns=msNextRuns; msNextRuns=[]; msPairIdx=0; msMerging=null;
+    if(msRuns.length<=1){
+      // Done — msRuns[0] is the final sorted order (indices into t50Pool)
+      t50S=msRuns[0]||[];
+      showFinal();
+      return;
+    }
+    // Another pass needed
+  }
+}
+
+function t50pick(ch){
+  // Save full merge state for undo
+  t50History.push({
+    runs:msRuns.map(r=>[...r]),
+    nextRuns:msNextRuns.map(r=>[...r]),
+    merging:msMerging?{...msMerging,L:[...msMerging.L],R:[...msMerging.R],buf:[...msMerging.buf]}:null,
+    pairIdx:msPairIdx,
+    qn:t50QN,
+    s:[...t50S]
+  });
+  const ub=document.getElementById('t50-undo-btn');if(ub)ub.style.display='';
+  const m=msMerging;
+  if(ch==='hi'){
+    // Left player (a) wins — add to buf, advance li
+    m.buf.push(m.L[m.li++]);
+  } else {
+    // Right player (b) wins — add to buf, advance ri
+    m.buf.push(m.R[m.ri++]);
+  }
+  msAskNext();
+}
+function undoT50Pick(){
+  if(t50History.length===0)return;
+  const h=t50History.pop();
+  msRuns=h.runs.map(r=>[...r]);
+  msNextRuns=h.nextRuns.map(r=>[...r]);
+  msMerging=h.merging?{...h.merging,L:[...h.merging.L],R:[...h.merging.R],buf:[...h.merging.buf]}:null;
+  msPairIdx=h.pairIdx;
+  t50QN=h.qn;
+  t50S=h.s;
+  if(t50History.length===0){const ub=document.getElementById('t50-undo-btn');if(ub)ub.style.display='none';}
+  show('s-top50');msAskNext();
+}
+function showT50Partial(){
+  // Build partial sorted list from completed merge runs
+  const partialSorted=[];
+  // Completed runs in msNextRuns + current merge buf (best-so-far ordering)
+  msNextRuns.forEach(r=>partialSorted.push(...r));
+  if(msMerging){
+    partialSorted.push(...msMerging.buf);
+    // Remaining unmerged players in current merge
+    for(let i=msMerging.li;i<msMerging.L.length;i++) partialSorted.push(msMerging.L[i]);
+    for(let i=msMerging.ri;i<msMerging.R.length;i++) partialSorted.push(msMerging.R[i]);
+  }
+  // Remaining untouched runs
+  for(let p=msPairIdx+(msMerging?1:0);p*2<msRuns.length;p++){
+    msRuns[p*2].forEach(x=>partialSorted.push(x));
+    if(msRuns[p*2+1]) msRuns[p*2+1].forEach(x=>partialSorted.push(x));
+  }
+  const prevT50S=t50S;
+  t50S=partialSorted;
+  buildResUI();
+  t50S=prevT50S;
+  document.getElementById('res-meta').textContent=`Partial — ${t50QN} questions so far. Keep going to refine the ranking.`;
+  let cb=document.getElementById('t50-cb');
+  if(!cb){cb=document.createElement('button');cb.id='t50-cb';cb.className='btn btn-p';cb.style.marginTop='14px';cb.textContent='Keep going';cb.onclick=()=>{cb.remove();show('s-top50');t50Ask();};document.getElementById('t50-list').after(cb);}
+  show('s-res');
+}
+
+// ── FINAL RESULTS ──────────────────────────────────────────────────────────
+function showFinal(){pi=7;updSteps();buildResUI();document.getElementById('res-meta').textContent=`${t50Pool.length} players ranked in ${t50QN} total questions.`;const cb=document.getElementById('t50-cb');if(cb)cb.remove();show('s-res');}
+function buildResUI(){
+  const el=document.getElementById('t50-list');el.innerHTML='';
+  t50S.forEach((idx,rank)=>{
+    const p=t50Pool[idx];const row=document.createElement('div');row.className='t50-row';
+    const nc=rank<10?'t50-n gold':'t50-n';
+    row.innerHTML=`<div class="${nc}">${rank+1}</div><div class="t50-name">${p.n}</div><div class="t50-pos">${p.pos}</div>`;
+    el.appendChild(row);
+  });
+  const pw=document.getElementById('pos-res');pw.innerHTML='';
+  POS.forEach(pos=>{
+    const s=posRes[pos.key];if(!s||!s.length)return;
+    const card=document.createElement('div');card.className='rcard';
+    card.innerHTML=`<div class="rcard-hdr"><span class="rch-abbr">${pos.abbr}</span><span class="rch-name">${pos.label}</span></div><div id="rl-${pos.key}"></div>`;
+    pw.appendChild(card);
+    const list=document.getElementById('rl-'+pos.key);
+    s.forEach((pidx,rank)=>{
+      const p=DB[pos.key][pidx];const row=document.createElement('div');row.className='r-row';
+      row.innerHTML=`<span class="r-num">${rank+1}</span><span class="r-name">${p.n}</span><span class="r-era">${p.e}</span>`;
+      list.appendChild(row);
+    });
+  });
+}
+
+// ── COMPARE MODAL ──────────────────────────────────────────────────────────
+function getCompPair(){
+  if(cmpCtx==='t50'){
+    const mid=Math.floor((t50Lo+t50Hi)/2);
+    return [t50Pool[t50Cur],t50Pool[t50S[mid]]];
+  } else {
+    const mid=Math.floor((bsLo+bsHi)/2);
+    return [bsPL[bsCur],bsPL[bsSorted[mid]]];
+  }
+}
+function openCompare(){cmpCtx='quiz';renderModal();}
+function openCompareT50(){cmpCtx='t50';renderModal();}
+function renderModal(){
+  const [pa,pb]=getCompPair();
+  const grid=document.getElementById('cmp-grid');grid.innerHTML='';
+  const stats=['ppg','rpg','apg','spg','bpg'];
+  const slbls={ppg:'PPG',rpg:'RPG',apg:'APG',spg:'SPG',bpg:'BPG'};
+  [pa,pb].forEach((p,ci)=>{
+    const col=document.createElement('div');col.className='cmp-col';
+    let rows='';
+    stats.forEach(k=>{
+      const va=pa.s[k],vb=pb.s[k];
+      if(va===null&&vb===null)return;
+      const va2=va!==null?va.toFixed(1):'N/A',vb2=vb!==null?vb.toFixed(1):'N/A';
+      const val=ci===0?va2:vb2;
+      const other=ci===0?vb:va;
+      const vNum=ci===0?va:vb,oNum=ci===0?vb:va;
+      const hi=vNum!==null&&oNum!==null&&vNum>oNum?'hi':'';
+      rows+=`<div class="stat-row"><span class="stat-lbl">${slbls[k]}</span><span class="stat-val ${hi}">${val}</span></div>`;
+    });
+    col.innerHTML=`<div class="cmp-pname">${p.n}</div><div class="cmp-era">${p.e}</div>${rows}`;
+    grid.appendChild(col);
+  });
+  ['a','b'].forEach((side,ci)=>{
+    const p=ci===0?pa:pb;
+    const sec=document.getElementById('cmp-acc-'+side);
+    sec.innerHTML=`<div class="acc-title">${p.n} — Accolades</div>${p.ac.map(a=>`<span class="acc-tag">${a}</span>`).join('')}`;
+  });
+  document.getElementById('modal-bg').classList.add('open');
+}
+function closeCompare(){document.getElementById('modal-bg').classList.remove('open');}
+document.getElementById('modal-bg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCompare();});
+
+updSteps();
+</script>
+</body>
+</html>
