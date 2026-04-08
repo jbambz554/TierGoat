@@ -75,7 +75,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM S
 <body>
 <div class="app">
 <div class="hdr">
-  <div class="logo-wrap">
+  <a href="index.html" style="text-decoration:none;" class="logo-wrap">
     <svg width="24" height="24" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="14" cy="17" rx="5.5" ry="4.5" fill="#d4a843"/>
       <ellipse cx="14" cy="10.5" rx="4" ry="3.5" fill="#d4a843"/>
@@ -90,7 +90,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM S
       <path d="M13 13.5 Q14 15 15 13.5" stroke="#c4a832" stroke-width="1.2" stroke-linecap="round" fill="none"/>
     </svg>
     <span class="logo">TierGoat</span>
-  </div>
+  </a>
   <a href="index.html" class="hdr-back">&#8592; All Rankers</a>
 </div>
 
@@ -99,8 +99,8 @@ html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM S
 <!-- HOME -->
 <div class="screen active" id="s-home">
   <div class="h-title">Rank the<br><em>Best</em><br>Pictures</div>
-  <p class="h-desc">Every Best Picture winner from 2000–2024, ranked by you. Head-to-head matchups until your definitive list is locked.</p>
-  <p class="h-meta"><span>25 items</span> &nbsp;·&nbsp; ~24 questions avg</p>
+  <p class="h-desc">Every Best Picture winner from 2000–2025, ranked by you. Head-to-head matchups until your definitive list is locked.</p>
+  <p class="h-meta"><span>26 films</span> &nbsp;·&nbsp; ~24 questions avg</p>
   <div class="btn-row">
     <button class="btn btn-p" onclick="startQuiz()">Start Ranking</button>
   </div>
@@ -179,7 +179,8 @@ const ITEMS = [
   {n:'CODA',p:'/6jv5OjgWUFBrfELm5mVOFMVOWtP.jpg',d:'2021 · Sian Heder'},
   {n:'Everything Everywhere All at Once',p:'/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg',d:'2022 · Daniels'},
   {n:'Oppenheimer',p:'/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg',d:'2023 · Christopher Nolan'},
-  {n:'Anora',p:'/a0HFnG6nkJSfflliuuJWbMBJTcx.jpg',d:'2024 · Sean Baker'}
+  {n:'Anora',p:'/a0HFnG6nkJSfflliuuJWbMBJTcx.jpg',d:'2024 · Sean Baker'},
+  {n:'One Battle After Another',p:'__wiki__',d:'2025 · Paul Thomas Anderson'}
 ];
 
 let sorted=[], queue=[], current=-1, lo=0, hi=0, qNum=0, history=[], unseen=[];
@@ -204,15 +205,14 @@ function ask(){
   if(lo>=hi){sorted.splice(lo,0,current);nextInsertion();return;}
   const mid=Math.floor((lo+hi)/2),piv=sorted[mid];
   const ins=ITEMS[current],pv=ITEMS[piv];
-  const base='https://image.tmdb.org/t/p/w185';
   document.getElementById('vna').textContent=ins.n;
   document.getElementById('vda').textContent=ins.d;
   const imgA=document.getElementById('poster-a');
-  if(imgA){imgA.src=ins.p?base+ins.p:'';imgA.style.display=ins.p?'block':'none';}
+  if(imgA&&ins.p)setImgWithFallback(imgA,ins.p,ins.n);else if(imgA)imgA.style.display='none';
   document.getElementById('vnb').textContent=pv.n;
   document.getElementById('vdb').textContent=pv.d;
   const imgB=document.getElementById('poster-b');
-  if(imgB){imgB.src=pv.p?base+pv.p:'';imgB.style.display=pv.p?'block':'none';}
+  if(imgB&&pv.p)setImgWithFallback(imgB,pv.p,pv.n);else if(imgB)imgB.style.display='none';
   qNum++;
   const pct=Math.min(97,Math.round((qNum/mxQ(ITEMS.length))*100));
   document.getElementById('qhint').textContent=
@@ -287,7 +287,7 @@ function buildResults(list, complete){
     const item=ITEMS[idx];
     const row=document.createElement('div');row.className='r-row';
     const nc=rank<10?'r-num gold':'r-num';
-    const pImg=item.p?`<img src="https://image.tmdb.org/t/p/w92${item.p}" style="width:36px;height:54px;object-fit:cover;border-radius:3px;flex-shrink:0;" alt="">`:'<div style="width:36px;height:54px;background:var(--s2);border-radius:3px;flex-shrink:0;"></div>';
+    const pImg=item.p?`<img src="https://image.tmdb.org/t/p/w154${item.p}" style="width:36px;height:54px;object-fit:cover;border-radius:3px;flex-shrink:0;" alt="">`:'<div style="width:36px;height:54px;background:var(--s2);border-radius:3px;flex-shrink:0;"></div>';
     row.innerHTML=`<div class="${nc}">${rank+1}</div>${pImg}<div class="r-name" style="font-size:13px;">${item.n}</div><div class="r-detail">${item.d}</div>`;
     el.appendChild(row);
   });
@@ -300,11 +300,55 @@ function buildResults(list, complete){
     unseen.forEach(idx=>{
       const item=ITEMS[idx];
       const row=document.createElement('div');row.className='r-row';
-      const pImg=item.p?`<img src="https://image.tmdb.org/t/p/w92${item.p}" style="width:36px;height:54px;object-fit:cover;border-radius:3px;flex-shrink:0;opacity:.45;" alt="">`:'<div style="width:36px;height:54px;background:var(--s2);border-radius:3px;flex-shrink:0;"></div>';
+      const pImg=item.p?`<img src="https://image.tmdb.org/t/p/w154${item.p}" style="width:36px;height:54px;object-fit:cover;border-radius:3px;flex-shrink:0;opacity:.45;" alt="">`:'<div style="width:36px;height:54px;background:var(--s2);border-radius:3px;flex-shrink:0;"></div>';
       row.innerHTML=`<div class="r-num" style="color:var(--mu);font-size:16px">—</div>${pImg}<div class="r-name" style="font-size:13px;color:var(--mu2)">${item.n}</div><div class="r-detail">${item.d}</div>`;
       el.appendChild(row);
     });
   }
+}
+
+// Poster loading via Wikipedia REST API (no key needed, guaranteed public)
+const WIKI_TITLES={'Gladiator':'Gladiator_(2000_film)','A Beautiful Mind':'A_Beautiful_Mind_(film)','Chicago':'Chicago_(2002_film)','The Lord of the Rings: Return of the King':'The_Lord_of_the_Rings:_The_Return_of_the_King','Million Dollar Baby':'Million_Dollar_Baby','Crash':'Crash_(2004_film)','The Departed':'The_Departed','No Country for Old Men':'No_Country_for_Old_Men','Slumdog Millionaire':'Slumdog_Millionaire','The Hurt Locker':'The_Hurt_Locker',"The King's Speech":'The_King%27s_Speech','The Artist':'The_Artist_(film)','Argo':'Argo_(2012_film)','12 Years a Slave':'12_Years_a_Slave_(film)','Birdman':'Birdman_(film)','Spotlight':'Spotlight_(film)','Moonlight':'Moonlight_(2016_film)','The Shape of Water':'The_Shape_of_Water_(film)','Green Book':'Green_Book_(film)','Parasite':'Parasite_(2019_film)','Nomadland':'Nomadland_(film)','CODA':'CODA_(2021_film)','Everything Everywhere All at Once':'Everything_Everywhere_All_at_Once','Oppenheimer':'Oppenheimer_(film)','Anora':'Anora','One Battle After Another':'One_Battle_After_Another'};
+
+const posterCache={};
+
+async function loadWikiPoster(title){
+  if(posterCache[title]!==undefined)return posterCache[title];
+  const wt=WIKI_TITLES[title];
+  if(!wt){posterCache[title]=null;return null;}
+  try{
+    const r=await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${wt}`,
+      {headers:{'Accept':'application/json'}});
+    const d=await r.json();
+    const url=d.thumbnail&&d.thumbnail.source?d.thumbnail.source.replace(/\/\d+px-/,'/342px-'):null;
+    posterCache[title]=url||null;
+    return posterCache[title];
+  }catch(e){posterCache[title]=null;return null;}
+}
+
+async function setImgWithFallback(imgEl, tmdbPath, title){
+  imgEl.style.display='none';
+  if(tmdbPath==='__wiki__'){
+    // Skip TMDB — go straight to Wikipedia fallback
+    const wikiUrl=await loadWikiPoster(title);
+    if(wikiUrl){imgEl.src=wikiUrl;imgEl.onload=()=>{imgEl.style.display='block';};imgEl.onerror=()=>{imgEl.style.display='none';};}
+    return;
+  }
+  // First try TMDB CDN path (fast, no request needed)
+  const base='https://image.tmdb.org/t/p/w342';
+  imgEl.src=base+tmdbPath;
+  imgEl.onload=()=>{imgEl.style.display='block';};
+  imgEl.onerror=async()=>{
+    // TMDB failed — fall back to Wikipedia poster
+    const wikiUrl=await loadWikiPoster(title);
+    if(wikiUrl){
+      imgEl.src=wikiUrl;
+      imgEl.onload=()=>{imgEl.style.display='block';};
+      imgEl.onerror=()=>{imgEl.style.display='none';};
+    } else {
+      imgEl.style.display='none';
+    }
+  };
 }
 </script>
 </body>
