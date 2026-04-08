@@ -255,6 +255,12 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans'
     <button class="btn btn-p" onclick="resumeQuiz()" id="mid-resume">Keep going</button>
     <button class="btn btn-g" onclick="useCurrentRanking()">Use this ranking</button>
   </div>
+  <div id="mid-save-row" style="display:none;margin-top:12px">
+    <div class="save-name-row">
+      <input class="save-input" id="pos-save-input" placeholder="Name this position ranking (optional)…" maxlength="40">
+      <button class="save-btn" id="pos-save-btn" onclick="savePositionRanking()">Save</button>
+    </div>
+  </div>
 </div>
 
 <!-- SELECT -->
@@ -471,6 +477,7 @@ function jumpToPos(idx){
     );
     midMode='jump';
     document.getElementById('mid-resume').textContent='Keep going →';
+    document.getElementById('mid-save-row').style.display='none';
     // Add redo button dynamically
     const existing=document.getElementById('mid-redo-btn');
     if(existing)existing.remove();
@@ -539,6 +546,10 @@ function finPos(){
   buildMid(bsSorted,POS[pi].label+' — Complete',`All ${bsSorted.length} players ranked in ${bsQN} questions.`,bsPL);
   midMode='done';
   document.getElementById('mid-resume').textContent=pi<4?'Next Position \u2192':'Build My Top 50 Pool';
+  document.getElementById('mid-save-row').style.display='';
+  document.getElementById('pos-save-input').value='';
+  document.getElementById('pos-save-btn').textContent='Save';
+  document.getElementById('pos-save-btn').style.color='';
   show('s-mid');
 }
 function useCurrentRanking(){
@@ -547,6 +558,10 @@ function useCurrentRanking(){
   buildMid(posRes[POS[pi].key],POS[pi].label+' — Saved',`${bsSorted.length} ranked, ${all.length} placed at bottom.`,bsPL);
   midMode='done';
   document.getElementById('mid-resume').textContent=pi<4?'Next Position \u2192':'Build My Top 50 Pool';
+  document.getElementById('mid-save-row').style.display='';
+  document.getElementById('pos-save-input').value='';
+  document.getElementById('pos-save-btn').textContent='Save';
+  document.getElementById('pos-save-btn').style.color='';
   show('s-mid');
 }
 function showMid(){
@@ -890,6 +905,35 @@ function putSaves(arr) {
   localStorage.setItem('tg_saves_' + RANKER_KEY, JSON.stringify(arr));
 }
 
+function savePositionRanking() {
+  const posKey = POS[pi].key;
+  const posLabel = POS[pi].label;
+  const ranked = posRes[posKey] || [];
+  if (ranked.length === 0) return;
+  const name = document.getElementById('pos-save-input').value.trim() ||
+    (posLabel + ' Rankings · ' + new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}));
+  const items = ranked.map((idx, rank) => ({
+    rank: rank + 1,
+    name: DB[posKey][idx].n,
+    emoji: '',
+    pos: posLabel
+  }));
+  const saves = getSaves();
+  saves.unshift({
+    id: Date.now(),
+    name,
+    date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
+    items,
+    type: 'position',
+    posLabel
+  });
+  putSaves(saves);
+  const btn = document.getElementById('pos-save-btn');
+  btn.textContent = '✓ Saved!';
+  btn.style.color = 'var(--green)';
+  setTimeout(() => { btn.textContent = 'Save'; btn.style.color = ''; }, 1800);
+}
+
 function saveRanking() {
   const name = document.getElementById('save-name-input').value.trim() ||
     new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
@@ -909,12 +953,26 @@ function saveRanking() {
     }
   });
   if (items.length === 0) return;
+  // Also capture positional breakdowns
+  const posBreakdowns = {};
+  POS.forEach(pos => {
+    const ranked = posRes[pos.key] || [];
+    if (ranked.length) {
+      posBreakdowns[pos.key] = {
+        label: pos.label,
+        abbr: pos.abbr,
+        players: ranked.map((idx, rank) => ({rank: rank+1, name: DB[pos.key][idx].n}))
+      };
+    }
+  });
   const saves = getSaves();
   saves.unshift({
     id: Date.now(),
     name,
     date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
-    items
+    items,
+    type: 'top50',
+    posBreakdowns
   });
   putSaves(saves);
   document.getElementById('save-name-input').value = '';
@@ -947,25 +1005,41 @@ function renderSavedModal() {
     body.innerHTML = '<div class="no-saves">No saved rankings yet.<br>Complete a ranking and tap "Save Ranking" to store it here.</div>';
     return;
   }
-  body.innerHTML = saves.map(s => `
+  body.innerHTML = saves.map(s => {
+    const mainList = s.items.map(item => `
+      <div class="saved-item-row">
+        <div class="saved-item-num ${item.rank <= 10 ? 'g' : ''}">${item.rank}</div>
+        ${item.emoji ? `<span style="font-size:15px">${item.emoji}</span>` : ''}
+        <div class="saved-item-name">${item.name}${item.pos ? `<span style="color:var(--mu);margin-left:6px;font-size:10px">${item.pos}</span>` : ''}</div>
+      </div>`).join('');
+    // Positional breakdowns (top-50 saves only)
+    let posSection = '';
+    if (s.type === 'top50' && s.posBreakdowns) {
+      posSection = '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b1)">';
+      posSection += '<div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);font-weight:500;margin-bottom:8px">By Position</div>';
+      Object.values(s.posBreakdowns).forEach(pb => {
+        posSection += `<div style="margin-bottom:8px"><div style="font-size:11px;font-weight:500;color:var(--ac);margin-bottom:4px">${pb.label}</div>`;
+        posSection += pb.players.map(p => `
+          <div class="saved-item-row">
+            <div class="saved-item-num ${p.rank <= 5 ? 'g' : ''}">${p.rank}</div>
+            <div class="saved-item-name">${p.name}</div>
+          </div>`).join('');
+        posSection += '</div>';
+      });
+      posSection += '</div>';
+    }
+    return `
     <div class="saved-entry">
       <div class="saved-entry-hdr">
         <div>
           <div class="saved-entry-name">${s.name}</div>
-          <div class="saved-entry-date">${s.date}</div>
+          <div class="saved-entry-date">${s.date}${s.type === 'position' ? ' · ' + s.posLabel : s.type === 'top50' ? ' · Top 50' : ''}</div>
         </div>
         <button class="saved-entry-del" onclick="deleteSave(${s.id})" title="Delete">&#215;</button>
       </div>
-      <div class="saved-entry-list">
-        ${s.items.map(item => `
-          <div class="saved-item-row">
-            <div class="saved-item-num ${item.rank <= 10 ? 'g' : ''}">${item.rank}</div>
-            ${item.emoji ? `<span style="font-size:15px">${item.emoji}</span>` : ''}
-            <div class="saved-item-name">${item.name}</div>
-          </div>`).join('')}
-        ${s.items.length > 10 ? `<div style="font-size:11px;color:var(--mu);padding:6px 0 2px">+${s.items.length - 10} more</div>` : ''}
-      </div>
-    </div>`).join('');
+      <div class="saved-entry-list">${mainList}${posSection}</div>
+    </div>`;
+  }).join('');
 }
 </script>
 </body>

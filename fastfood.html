@@ -37,6 +37,9 @@ html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM S
 .pfill{height:100%;background:var(--ac);border-radius:1px;transition:width .22s;}
 .q-hint{font-size:12px;color:var(--mu2);margin-bottom:16px;min-height:30px;line-height:1.55;}
 .vs{display:flex;gap:8px;margin-bottom:10px;}
+.vc-wrap{flex:1;display:flex;flex-direction:column;gap:6px;}
+.hwb{width:100%;padding:6px 8px;background:transparent;border:1px solid var(--b1);border-radius:6px;color:var(--mu);font-size:10px;letter-spacing:.04em;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .12s,border-color .12s;}
+.hwb:hover{color:var(--tx);border-color:var(--b2);}
 .vc{flex:1;background:var(--s1);border:1px solid var(--b2);border-radius:12px;padding:20px 14px;cursor:pointer;text-align:center;transition:border-color .12s,background .12s,transform .1s;position:relative;overflow:hidden;}
 .vc::after{content:'';position:absolute;inset:0;background:var(--ac);opacity:0;transition:opacity .12s;}
 .vc:hover{border-color:var(--ac);background:var(--s2);}
@@ -141,14 +144,20 @@ html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM S
   <div class="pbar"><div class="pfill" id="qpf" style="width:0%"></div></div>
   <div class="q-hint" id="qhint"></div>
   <div class="vs">
-    <div class="vc" onclick="pick('hi')">
-      <div class="vc-name" id="vna">—</div>
-      <div class="vc-detail" id="vda">—</div>
+    <div class="vc-wrap">
+      <div class="vc" onclick="pick('hi')">
+        <div class="vc-name" id="vna">—</div>
+        <div class="vc-detail" id="vda">—</div>
+      </div>
+      <button class="hwb" onclick="skipItem('a')">Haven&#39;t Tried &#8594;</button>
     </div>
     <div class="vs-sep">vs</div>
-    <div class="vc" onclick="pick('lo')">
-      <div class="vc-name" id="vnb">—</div>
-      <div class="vc-detail" id="vdb">—</div>
+    <div class="vc-wrap">
+      <div class="vc" onclick="pick('lo')">
+        <div class="vc-name" id="vnb">—</div>
+        <div class="vc-detail" id="vdb">—</div>
+      </div>
+      <button class="hwb" onclick="skipItem('b')">Haven&#39;t Tried &#8594;</button>
     </div>
   </div>
   <div class="btn-actions">
@@ -209,7 +218,7 @@ const ITEMS = [
   {n:"Checkers / Rally's",emoji:'🏁',d:'Burgers · National'}
 ];
 
-let sorted=[], queue=[], current=-1, lo=0, hi=0, qNum=0, history=[];
+let sorted=[], queue=[], current=-1, lo=0, hi=0, qNum=0, history=[], unseen=[];
 
 function mxQ(n){let t=0;for(let i=2;i<=n;i++)t+=Math.ceil(Math.log2(i));return t;}
 function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
@@ -217,7 +226,7 @@ function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.re
 
 function startQuiz(){
   const ix=ITEMS.map((_,i)=>i);shuf(ix);
-  sorted=[ix[0]];queue=ix.slice(1);current=-1;qNum=0;history=[];
+  sorted=[ix[0]];queue=ix.slice(1);current=-1;qNum=0;history=[];unseen=[];
   document.getElementById('undo-btn').style.display='none';
   show('s-quiz');nextInsertion();
 }
@@ -243,7 +252,7 @@ function ask(){
 }
 
 function pick(ch){
-  history.push({sorted:[...sorted],queue:[...queue],current,lo,hi,qNum});
+  history.push({sorted:[...sorted],queue:[...queue],current,lo,hi,qNum,unseen:[...unseen]});
   document.getElementById('undo-btn').style.display='';
   const mid=Math.floor((lo+hi)/2);
   if(ch==='hi')hi=mid;else lo=mid+1;
@@ -253,11 +262,24 @@ function pick(ch){
 function undoPick(){
   if(history.length===0)return;
   const h=history.pop();
-  sorted=h.sorted;queue=h.queue;current=h.current;lo=h.lo;hi=h.hi;qNum=h.qNum;
+  sorted=h.sorted;queue=h.queue;current=h.current;lo=h.lo;hi=h.hi;qNum=h.qNum;if(h.unseen)unseen=h.unseen;
   if(history.length===0)document.getElementById('undo-btn').style.display='none';
   show('s-quiz');ask();
 }
 
+function skipItem(side){
+  history.push({sorted:[...sorted],queue:[...queue],current,lo,hi,qNum,unseen:[...unseen]});
+  document.getElementById('undo-btn').style.display='';
+  const mid=Math.floor((lo+hi)/2);
+  if(side==='a'){
+    unseen.push(current);current=-1;lo=0;hi=0;nextInsertion();
+  } else {
+    const pivotIdx=sorted.splice(mid,1)[0];
+    unseen.push(pivotIdx);
+    hi=Math.min(hi,sorted.length);lo=Math.min(lo,sorted.length);
+    ask();
+  }
+}
 function showPartial(){
   const partial=[...sorted,...(current>=0?[current]:[]),...queue];
   buildResults(partial, false);
@@ -277,18 +299,34 @@ function showResults(complete){
 }
 
 function buildResults(list, complete){
+  const watched=list.filter(i=>!unseen.includes(i));
+  const skippedNote=unseen.length?' '+unseen.length+' skipped.':'';
   document.getElementById('res-meta').textContent = complete
-    ? `All ${ITEMS.length} ranked in ${qNum} questions.`
-    : `Partial — ${qNum} questions so far. ${queue.length} still to place.`;
+    ? `${watched.length} ranked.${skippedNote}`
+    : `Partial — ${queue.length} still to place.${skippedNote}`;
   const el=document.getElementById('res-list');
   el.innerHTML='';
-  list.forEach((idx,rank)=>{
+  watched.forEach((idx,rank)=>{
     const item=ITEMS[idx];
     const row=document.createElement('div');row.className='r-row';
     const nc=rank<10?'r-num gold':'r-num';
     row.innerHTML=`<div class="${nc}">${rank+1}</div><div class="r-name">${item.emoji?item.emoji+' ':''}${item.n}</div><div class="r-detail">${item.d}</div>`;
     el.appendChild(row);
   });
+  if(unseen.length>0){
+    const div=document.createElement('div');
+    div.style.cssText='margin:20px 0 8px;padding-top:16px;border-top:1px solid var(--b1);';
+    const label=document.createElement('div');
+    label.style.cssText='font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);font-weight:500;margin-bottom:10px';
+    label.textContent="Haven't Tried";
+    div.appendChild(label);
+    el.appendChild(div);
+    unseen.forEach(idx=>{
+      const item=ITEMS[idx];const row=document.createElement('div');row.className='r-row';
+      row.innerHTML=`<div class="r-num" style="color:var(--mu);font-size:16px">—</div><div class="r-name" style="color:var(--mu2)">${item.emoji?item.emoji+' ':''}${item.n}</div><div class="r-detail">${item.d}</div>`;
+      el.appendChild(row);
+    });
+  }
 }
 </script>
 
@@ -388,7 +426,6 @@ function renderSavedModal() {
             ${item.emoji ? `<span style="font-size:15px">${item.emoji}</span>` : ''}
             <div class="saved-item-name">${item.name}</div>
           </div>`).join('')}
-        ${s.items.length > 10 ? `<div style="font-size:11px;color:var(--mu);padding:6px 0 2px">+${s.items.length - 10} more</div>` : ''}
       </div>
     </div>`).join('');
 }

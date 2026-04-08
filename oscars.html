@@ -481,7 +481,6 @@ function renderSavedModal() {
             ${item.emoji ? `<span style="font-size:15px">${item.emoji}</span>` : ''}
             <div class="saved-item-name">${item.name}</div>
           </div>`).join('')}
-        ${s.items.length > 10 ? `<div style="font-size:11px;color:var(--mu);padding:6px 0 2px">+${s.items.length - 10} more</div>` : ''}
       </div>
     </div>`).join('');
 }
