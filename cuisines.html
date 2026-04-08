@@ -181,7 +181,7 @@ const ITEMS=[
 const RANKER_KEY='cuisines';
 let sorted=[],queue=[],current=-1,lo=0,hi=0,qNum=0,history=[],unseen=[];
 function mxQ(n){let t=0;for(let i=2;i<=n;i++)t+=Math.ceil(Math.log2(i));return t;}
-function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function startQuiz(){
   const ix=ITEMS.map((_,i)=>i);shuf(ix);
@@ -275,7 +275,7 @@ function buildResults(list,complete){
     });
   }
 }
-function getSaves(){try{return JSON.parse(localStorage.getItem('tg_saves_'+RANKER_KEY)||'[]');}catch(e){return[];}}
+function getSaves(){try{return JSON.parse(localStorage.getItem('tg_saves_'+RANKER_KEY)||'[]');}catch(e){return[];}
 function putSaves(arr){localStorage.setItem('tg_saves_'+RANKER_KEY,JSON.stringify(arr));}
 function saveRanking(){
   const name=document.getElementById('save-name-input').value.trim()||
