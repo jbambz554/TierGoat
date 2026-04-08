@@ -319,10 +319,9 @@ function renderSavedModal(){
   let html='';
   saves.forEach(function(s){
     html+='<div class="saved-entry"><div class="saved-entry-hdr"><div><div class="saved-entry-name">'+s.name+'</div><div class="saved-entry-date">'+s.date+'</div></div><button class="saved-entry-del" onclick="deleteSave('+s.id+')">&#215;</button></div><div class="saved-entry-list">';
-    s.items.slice(0,10).forEach(function(item){
+    s.items.forEach(function(item){
       html+='<div class="saved-item-row"><div class="saved-item-num'+(item.rank<=10?' g':'')+'">'+item.rank+'</div>'+(item.emoji?'<span style="font-size:15px">'+item.emoji+'</span>':'')+'<div class="saved-item-name">'+item.name+'</div></div>';
     });
-    if(s.items.length>10)html+='<div style="font-size:11px;color:var(--mu);padding:6px 0 2px">+' +(s.items.length-10)+' more</div>';
     html+='</div></div>';
   });
   body.innerHTML=html;

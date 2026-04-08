@@ -361,7 +361,7 @@ function renderSavedModal() {
         <button class="saved-entry-del" onclick="deleteSave(${s.id})" title="Delete">&#215;</button>
       </div>
       <div class="saved-entry-list">
-        ${s.items.slice(0, 10).map(item => `
+        ${s.items.map(item => `
           <div class="saved-item-row">
             <div class="saved-item-num ${item.rank <= 10 ? 'g' : ''}">${item.rank}</div>
             ${item.emoji ? `<span style="font-size:15px">${item.emoji}</span>` : ''}

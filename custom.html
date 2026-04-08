@@ -375,12 +375,11 @@ function renderSavedModal(){
         <button class="saved-entry-del" onclick="deleteSave(${s.id})">&#215;</button>
       </div>
       <div class="saved-entry-list">
-        ${s.items.slice(0,10).map(item=>`
+        ${s.items.map(item=>`
           <div class="saved-item-row">
             <div class="saved-item-num ${item.rank<=10?'g':''}">${item.rank}</div>
             <div class="saved-item-name">${item.name}</div>
           </div>`).join('')}
-        ${s.items.length>10?`<div style="font-size:11px;color:var(--mu);padding:6px 0 2px">+${s.items.length-10} more</div>`:''}
       </div>
     </div>`).join('');
 }
