@@ -138,6 +138,35 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans'
 .cmp-btn{background:var(--s2);border:1px solid var(--b2);color:var(--mu2);border-radius:6px;padding:5px 11px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:color .12s,border-color .12s;}
 .cmp-btn:hover{color:var(--tx);border-color:var(--b3);}
 .mid-divider{height:1px;background:var(--b1);margin:18px 0;}
+
+/* SAVE SYSTEM */
+.save-btn{background:var(--s2);border:1px solid var(--b2);color:var(--ac);border-radius:8px;padding:9px 18px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .12s,border-color .12s;}
+.save-btn:hover{background:var(--s3);border-color:var(--b3);}
+.saved-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;padding:16px;}
+.saved-modal-bg.open{display:flex;}
+.saved-modal{background:var(--s1);border:1px solid var(--b2);border-radius:14px;width:100%;max-width:500px;max-height:88vh;display:flex;flex-direction:column;}
+.saved-modal-hdr{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.saved-modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--ac);}
+.saved-modal-close{background:none;border:none;color:var(--mu);font-size:22px;cursor:pointer;line-height:1;}
+.saved-modal-close:hover{color:var(--tx);}
+.saved-modal-body{overflow-y:auto;padding:14px 18px;flex:1;}
+.saved-entry{border:1px solid var(--b1);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+.saved-entry-hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--s2);}
+.saved-entry-name{font-size:13px;font-weight:500;color:var(--tx);}
+.saved-entry-date{font-size:11px;color:var(--mu);}
+.saved-entry-del{background:none;border:none;color:var(--mu);font-size:16px;cursor:pointer;padding:2px 6px;border-radius:4px;}
+.saved-entry-del:hover{color:var(--red);background:rgba(232,90,74,.1);}
+.saved-entry-list{padding:10px 14px;}
+.saved-item-row{display:flex;gap:8px;align-items:center;padding:4px 0;font-size:12px;color:var(--mu2);border-bottom:.5px solid var(--b1);}
+.saved-item-row:last-child{border-bottom:none;}
+.saved-item-num{font-family:'Bebas Neue',sans-serif;font-size:16px;min-width:26px;text-align:right;color:var(--mu);}
+.saved-item-num.g{color:var(--ac);}
+.saved-item-name{flex:1;color:var(--tx);}
+.no-saves{color:var(--mu);font-size:13px;text-align:center;padding:24px 0;}
+.save-name-row{display:flex;gap:8px;margin-bottom:14px;}
+.save-input{flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none;}
+.save-input:focus{border-color:var(--ac);}
+.save-input::placeholder{color:var(--mu);}
 </style>
 </head>
 <body>
@@ -193,12 +222,13 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans'
     <div class="pos-start-row" onclick="startPos(4)"><span class="pos-start-abbr">C</span><span class="pos-start-name">Centers</span><span class="pos-start-arr">&#8594;</span></div>
   </div>
   <p style="font-size:11px;color:var(--mu);line-height:1.6">Rank all 5 positions to unlock the Top 50 builder. Or jump straight to any position.</p>
+  <div class="btn-row" style="margin-top:16px"><button class="save-btn" onclick="openSavedModal()">View Saved Rankings</button></div>
 </div>
 
 <!-- QUIZ -->
 <div class="screen" id="s-quiz">
   <div class="q-lbl" id="qlbl"></div>
-  <div class="q-prog-row"><span id="qnum" style="color:var(--mu)">Question 1</span></div>
+  
   <div class="pbar"><div class="pfill" id="qpf" style="width:0%"></div></div>
   <div class="q-hint" id="qhint"></div>
   <div class="vs">
@@ -244,7 +274,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans'
 <!-- TOP 50 QUIZ -->
 <div class="screen" id="s-top50">
   <div class="q-lbl" style="font-size:26px">Top 50 — All Time</div>
-  <div class="q-prog-row"><span id="t50num" style="color:var(--mu)">Question 1</span></div>
+  
   <div class="pbar"><div class="pfill" id="t50pf" style="width:0%"></div></div>
   <div class="q-hint" id="t50hint"></div>
   <div class="vs">
@@ -275,7 +305,11 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans'
   <div class="mid-divider"></div>
   <div class="q-lbl" style="font-size:24px;margin-bottom:14px">By Position</div>
   <div id="pos-res"></div>
-  <div class="btn-row" style="margin-top:18px">
+  <div class="save-name-row" style="margin-top:18px">
+    <input class="save-input" id="save-name-input" placeholder="Name this ranking (optional)…" maxlength="40">
+    <button class="save-btn" id="save-ranking-btn" onclick="saveRanking()">Save Ranking</button>
+  </div>
+  <div class="btn-row" style="margin-top:8px">
     <button class="btn btn-g" onclick="location.reload()">Start Over</button>
   </div>
 </div>
@@ -488,7 +522,6 @@ function bsAsk(){
   bsQN++;
   const rem=bsQ.length,pct=Math.min(97,Math.round((bsQN/mxQ(bsPL.length))*100));
   document.getElementById('qhint').textContent=`Placing ${ins.n} — vs. #${mid+1} in your ranking. ${rem} player${rem!==1?'s':''} still to place.`;
-  document.getElementById('qnum').textContent=`Question ${bsQN}`;
   
   document.getElementById('qpf').style.width=pct+'%';
 }
@@ -674,7 +707,6 @@ function msAskNext(){
         const totalLeft=msRuns.length+msNextRuns.length+(msMerging?1:0)-1;
         document.getElementById('t50hint').textContent=
           `${pa.n} (${pa.pos}) vs ${pb.n} (${pb.pos}) — ${totalLeft} merge${totalLeft!==1?'s':''} remaining.`;
-        document.getElementById('t50num').textContent=`Question ${t50QN}`;
         
         document.getElementById('t50pf').style.width=pct+'%';
         return; // wait for user
@@ -835,6 +867,108 @@ function closeCompare(){document.getElementById('modal-bg').classList.remove('op
 document.getElementById('modal-bg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCompare();});
 
 updSteps();
+</script>
+
+<!-- SAVED RANKINGS MODAL -->
+<div class="saved-modal-bg" id="saved-modal-bg">
+  <div class="saved-modal">
+    <div class="saved-modal-hdr">
+      <div class="saved-modal-title">Saved Rankings</div>
+      <button class="saved-modal-close" onclick="closeSavedModal()">&#215;</button>
+    </div>
+    <div class="saved-modal-body" id="saved-modal-body"></div>
+  </div>
+</div>
+
+<script>
+const RANKER_KEY = 'nba';
+
+// ── SAVE SYSTEM ──────────────────────────────────────────────────────────────
+function getSaves() {
+  try { return JSON.parse(localStorage.getItem('tg_saves_' + RANKER_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function putSaves(arr) {
+  localStorage.setItem('tg_saves_' + RANKER_KEY, JSON.stringify(arr));
+}
+
+function saveRanking() {
+  const name = document.getElementById('save-name-input').value.trim() ||
+    new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  // Collect the current displayed ranking from the results list
+  const rows = document.querySelectorAll('#t50-list .t50-row, #res-list .r-row');
+  const items = [];
+  rows.forEach(row => {
+    const nameEl = row.querySelector('.r-name, .t50-name');
+    const numEl  = row.querySelector('.r-num, .t50-n');
+    const emojiEl = row.querySelector('.r-emoji');
+    if (nameEl && numEl && !numEl.textContent.includes('—')) {
+      items.push({
+        rank: parseInt(numEl.textContent) || 0,
+        name: nameEl.textContent.trim(),
+        emoji: emojiEl ? emojiEl.textContent.trim() : ''
+      });
+    }
+  });
+  if (items.length === 0) return;
+  const saves = getSaves();
+  saves.unshift({
+    id: Date.now(),
+    name,
+    date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
+    items
+  });
+  putSaves(saves);
+  document.getElementById('save-name-input').value = '';
+  const btn = document.getElementById('save-ranking-btn');
+  btn.textContent = '✓ Saved!';
+  btn.style.color = 'var(--green)';
+  setTimeout(() => { btn.textContent = 'Save Ranking'; btn.style.color = ''; }, 1800);
+}
+
+function openSavedModal() {
+  renderSavedModal();
+  document.getElementById('saved-modal-bg').classList.add('open');
+}
+function closeSavedModal() {
+  document.getElementById('saved-modal-bg').classList.remove('open');
+}
+document.getElementById('saved-modal-bg').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeSavedModal();
+});
+
+function deleteSave(id) {
+  putSaves(getSaves().filter(s => s.id !== id));
+  renderSavedModal();
+}
+
+function renderSavedModal() {
+  const saves = getSaves();
+  const body = document.getElementById('saved-modal-body');
+  if (saves.length === 0) {
+    body.innerHTML = '<div class="no-saves">No saved rankings yet.<br>Complete a ranking and tap "Save Ranking" to store it here.</div>';
+    return;
+  }
+  body.innerHTML = saves.map(s => `
+    <div class="saved-entry">
+      <div class="saved-entry-hdr">
+        <div>
+          <div class="saved-entry-name">${s.name}</div>
+          <div class="saved-entry-date">${s.date}</div>
+        </div>
+        <button class="saved-entry-del" onclick="deleteSave(${s.id})" title="Delete">&#215;</button>
+      </div>
+      <div class="saved-entry-list">
+        ${s.items.slice(0, 10).map(item => `
+          <div class="saved-item-row">
+            <div class="saved-item-num ${item.rank <= 10 ? 'g' : ''}">${item.rank}</div>
+            ${item.emoji ? `<span style="font-size:15px">${item.emoji}</span>` : ''}
+            <div class="saved-item-name">${item.name}</div>
+          </div>`).join('')}
+        ${s.items.length > 10 ? `<div style="font-size:11px;color:var(--mu);padding:6px 0 2px">+${s.items.length - 10} more</div>` : ''}
+      </div>
+    </div>`).join('');
+}
 </script>
 </body>
 </html>
