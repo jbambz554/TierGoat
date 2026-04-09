@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TierGoat — NFL Best Current QBs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080808;--s1:#111;--s2:#181818;--s3:#222;--b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.14);--b3:rgba(255,255,255,.22);--tx:#efefef;--mu:#5a5a5a;--mu2:#888;--ac:#3dba6e;--ac2:#2e9a56;--red:#e85a4a;--green:#4acd8d;}
+*{box-sizing:border-box;margin:0;padding:0;}html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;}
+.app{min-height:100vh;display:flex;flex-direction:column;}
+.hdr{padding:16px 24px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
+.logo-wrap{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--ac);}
+.hdr-back{font-size:11px;color:var(--mu);text-decoration:none;opacity:.7;}
+.hdr-back:hover{opacity:1;color:var(--tx);}
+.main{flex:1;max-width:560px;margin:0 auto;width:100%;padding:28px 20px 48px;}
+.screen{display:none;flex-direction:column;}.screen.active{display:flex;}
+.h-title{font-family:'Bebas Neue',sans-serif;font-size:50px;line-height:.95;letter-spacing:3px;margin-bottom:10px;}
+.h-title em{color:var(--ac);font-style:normal;}
+.h-desc{font-size:13px;color:var(--mu2);line-height:1.75;margin-bottom:10px;max-width:400px;}
+.h-meta{font-size:12px;color:var(--mu);margin-bottom:28px;}.h-meta span{color:var(--ac);}
+.q-lbl{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--ac);margin-bottom:2px;}
+.pbar{height:2px;background:var(--s3);border-radius:1px;overflow:hidden;margin-bottom:16px;}
+.pfill{height:100%;background:var(--ac);border-radius:1px;transition:width .22s;}
+.q-hint{font-size:12px;color:var(--mu2);margin-bottom:16px;min-height:30px;line-height:1.55;}
+.vs{display:flex;gap:8px;margin-bottom:10px;}
+.vc-wrap{flex:1;display:flex;flex-direction:column;gap:6px;}
+.vc{background:var(--s1);border:1px solid var(--b2);border-radius:12px;padding:20px 14px;cursor:pointer;text-align:center;transition:border-color .12s,background .12s,transform .1s;position:relative;overflow:hidden;}
+.vc::after{content:'';position:absolute;inset:0;background:var(--ac);opacity:0;transition:opacity .12s;}
+.vc:hover{border-color:var(--ac);background:var(--s2);}.vc:hover::after{opacity:.04;}.vc:active{transform:scale(.97);}
+.vc-emoji{font-size:28px;margin-bottom:6px;line-height:1.2;position:relative;}
+.vc-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--tx);margin-bottom:3px;position:relative;}
+.vc-detail{font-size:11px;color:var(--mu);position:relative;}
+.vs-sep{display:flex;align-items:center;justify-content:center;width:24px;flex-shrink:0;font-size:11px;color:var(--mu);font-weight:500;}
+.hwb{width:100%;padding:6px 8px;background:transparent;border:1px solid var(--b1);border-radius:6px;color:var(--mu);font-size:10px;letter-spacing:.04em;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .12s,border-color .12s;}
+.hwb:hover{color:var(--tx);border-color:var(--b2);}
+.btn-actions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.cmp-btn{background:var(--s2);border:1px solid var(--b2);color:var(--mu2);border-radius:6px;padding:5px 11px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.cmp-btn:hover{color:var(--tx);border-color:var(--b3);}
+.res-title{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:2px;color:var(--ac);margin-bottom:4px;}
+.res-meta{font-size:12px;color:var(--mu);margin-bottom:20px;}
+.r-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:.5px solid var(--b1);}.r-row:last-child{border-bottom:none;}
+.r-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--mu);min-width:34px;text-align:right;line-height:1;}.r-num.gold{color:var(--ac);}
+.r-emoji{font-size:20px;min-width:28px;text-align:center;}.r-name{font-size:14px;color:var(--tx);flex:1;}.r-detail{font-size:11px;color:var(--mu);}
+.btn{padding:11px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,transform .1s;font-family:'DM Sans',sans-serif;}.btn:active{transform:scale(.98);}
+.btn-p{background:var(--ac);color:#000;}.btn-p:hover{opacity:.88;}
+.btn-g{background:transparent;color:var(--mu2);border:1px solid var(--b2);}.btn-g:hover{color:var(--tx);background:var(--s2);}
+.btn-sm{padding:7px 14px;font-size:11px;}.btn-row{display:flex;gap:8px;flex-wrap:wrap;}
+.save-btn{background:var(--s2);border:1px solid var(--b2);color:var(--ac);border-radius:8px;padding:9px 18px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;}.save-btn:hover{background:var(--s3);}
+.save-name-row{display:flex;gap:8px;margin-bottom:10px;}
+.save-input{flex:1;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--tx);font-family:'DM Sans',sans-serif;outline:none;}.save-input:focus{border-color:var(--ac);}.save-input::placeholder{color:var(--mu);}
+.saved-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;padding:16px;}.saved-modal-bg.open{display:flex;}
+.saved-modal{background:var(--s1);border:1px solid var(--b2);border-radius:14px;width:100%;max-width:500px;max-height:88vh;display:flex;flex-direction:column;}
+.saved-modal-hdr{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.saved-modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--ac);}
+.saved-modal-close{background:none;border:none;color:var(--mu);font-size:22px;cursor:pointer;line-height:1;}.saved-modal-close:hover{color:var(--tx);}
+.saved-modal-body{overflow-y:auto;padding:14px 18px;flex:1;}
+.saved-entry{border:1px solid var(--b1);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+.saved-entry-hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--s2);}
+.saved-entry-name{font-size:13px;font-weight:500;color:var(--tx);}.saved-entry-date{font-size:11px;color:var(--mu);}
+.saved-entry-del{background:none;border:none;color:var(--mu);font-size:16px;cursor:pointer;padding:2px 6px;}.saved-entry-del:hover{color:var(--red);}
+.saved-entry-list{padding:10px 14px;}
+.saved-item-row{display:flex;gap:8px;align-items:center;padding:4px 0;font-size:12px;border-bottom:.5px solid var(--b1);}.saved-item-row:last-child{border-bottom:none;}
+.saved-item-num{font-family:'Bebas Neue',sans-serif;font-size:16px;min-width:24px;text-align:right;color:var(--mu);}.saved-item-num.g{color:var(--ac);}
+.saved-item-name{flex:1;color:var(--tx);}.no-saves{color:var(--mu);font-size:13px;text-align:center;padding:24px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr">
+  <a href="index.html" class="logo-wrap">
+    <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+      <ellipse cx="14" cy="17" rx="5.5" ry="4.5" fill="#3dba6e"/>
+      <ellipse cx="14" cy="10.5" rx="4" ry="3.5" fill="#3dba6e"/>
+      <path d="M11 8 Q9.5 4.5 8 5.5" stroke="#3dba6e" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      <path d="M17 8 Q18.5 4.5 20 5.5" stroke="#3dba6e" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      <ellipse cx="10.5" cy="9.5" rx="1.2" ry="1.8" fill="#3dba6e" transform="rotate(-20 10.5 9.5)"/>
+      <ellipse cx="17.5" cy="9.5" rx="1.2" ry="1.8" fill="#3dba6e" transform="rotate(20 17.5 9.5)"/>
+      <rect x="10" y="20.5" width="2" height="4.5" rx="1" fill="#3dba6e"/>
+      <rect x="16" y="20.5" width="2" height="4.5" rx="1" fill="#3dba6e"/>
+      <circle cx="12.5" cy="10" r="0.8" fill="#0a0a0a"/>
+      <circle cx="15.5" cy="10" r="0.8" fill="#0a0a0a"/>
+      <path d="M13 13.5 Q14 15 15 13.5" stroke="#2e9a56" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    </svg>
+    <span class="logo">TierGoat</span>
+  </a>
+  <a href="index.html" class="hdr-back">&#8592; All Rankers</a>
+</div>
+<div class="main">
+
+<div class="screen active" id="s-home">
+  <div class="h-title">Best Current<br><em>NFL</em><br>Quarterbacks</div>
+  <p class="h-desc">All 32 teams represented. Who is the best QB in the league right now?</p>
+  <p class="h-meta"><span>37 quarterbacks</span></p>
+  <div class="btn-row"><button class="btn btn-p" onclick="startQuiz()">Start Ranking</button></div>
+  <div class="btn-row" style="margin-top:10px"><button class="save-btn" onclick="openSavedModal()">View Saved Rankings</button></div>
+</div>
+
+<div class="screen" id="s-quiz">
+  <div class="q-lbl">Current NFL QBs</div>
+  <div class="pbar"><div class="pfill" id="qpf" style="width:0%"></div></div>
+  <div class="q-hint" id="qhint"></div>
+  <div class="vs">
+    <div class="vc-wrap">
+      <div class="vc" onclick="pick('hi')">
+        <div class="vc-emoji" id="vea">&mdash;</div>
+        <div class="vc-name" id="vna">&mdash;</div>
+        <div class="vc-detail" id="vda">&mdash;</div>
+      </div>
+      <button class="hwb" onclick="skipItem('a')">Haven't Watched &#8594;</button>
+    </div>
+    <div class="vs-sep">vs</div>
+    <div class="vc-wrap">
+      <div class="vc" onclick="pick('lo')">
+        <div class="vc-emoji" id="veb">&mdash;</div>
+        <div class="vc-name" id="vnb">&mdash;</div>
+        <div class="vc-detail" id="vdb">&mdash;</div>
+      </div>
+      <button class="hwb" onclick="skipItem('b')">Haven't Watched &#8594;</button>
+    </div>
+  </div>
+  <div class="btn-actions">
+    <button class="cmp-btn" id="undo-btn" style="display:none" onclick="undoPick()">&#8592; Undo</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-g btn-sm" onclick="showPartial()">See ranking so far</button>
+  </div>
+</div>
+
+<div class="screen" id="s-res">
+  <div class="res-title">Your Ranking</div>
+  <div class="res-meta" id="res-meta"></div>
+  <div id="res-list"></div>
+  <div class="save-name-row" style="margin-top:20px">
+    <input class="save-input" id="save-name-input" placeholder="Name this ranking (optional)&#8230;" maxlength="40">
+    <button class="save-btn" id="save-ranking-btn" onclick="saveRanking()">Save Ranking</button>
+  </div>
+  <div class="btn-row" style="margin-top:8px">
+    <button class="btn btn-p" onclick="startQuiz()">Start Over</button>
+    <button class="btn btn-g" id="continue-btn" style="display:none" onclick="continueQuiz()">Keep going</button>
+  </div>
+</div>
+
+</div>
+</div>
+
+<div class="saved-modal-bg" id="saved-modal-bg">
+  <div class="saved-modal">
+    <div class="saved-modal-hdr">
+      <div class="saved-modal-title">Saved Rankings</div>
+      <button class="saved-modal-close" onclick="closeSavedModal()">&#215;</button>
+    </div>
+    <div class="saved-modal-body" id="saved-modal-body"></div>
+  </div>
+</div>
+
+<script>
+
+var ITEMS = [
+{n:'Patrick Mahomes',e:'🏹',d:'Kansas City Chiefs'},
+{n:'Josh Allen',e:'🦬',d:'Buffalo Bills'},
+{n:'Lamar Jackson',e:'🦅',d:'Baltimore Ravens'},
+{n:'Joe Burrow',e:'🐯',d:'Cincinnati Bengals'},
+{n:'Jalen Hurts',e:'🦅',d:'Philadelphia Eagles'},
+{n:'Dak Prescott',e:'⭐',d:'Dallas Cowboys'},
+{n:'Justin Herbert',e:'⚡',d:'Los Angeles Chargers'},
+{n:'Sam Darnold',e:'🦅',d:'Seattle Seahawks'},
+{n:'Brock Purdy',e:'🏈',d:'San Francisco 49ers'},
+{n:'Jordan Love',e:'🧀',d:'Green Bay Packers'},
+{n:'Drake Maye',e:'🦅',d:'New England Patriots'},
+{n:'Caleb Williams',e:'🐻',d:'Chicago Bears'},
+{n:'CJ Stroud',e:'🐂',d:'Houston Texans'},
+{n:'Jayden Daniels',e:'🐺',d:'Washington Commanders'},
+{n:'Jared Goff',e:'🦁',d:'Detroit Lions'},
+{n:'Bo Nix',e:'🐴',d:'Denver Broncos'},
+{n:'Malik Willis',e:'🐬',d:'Miami Dolphins'},
+{n:'Trevor Lawrence',e:'🐆',d:'Jacksonville Jaguars'},
+{n:'Baker Mayfield',e:'🏴\u200d☠️',d:'Tampa Bay Buccaneers'},
+{n:'Cam Ward',e:'🐯',d:'Tennessee Titans'},
+{n:'Anthony Richardson',e:'🐴',d:'Indianapolis Colts'},
+{n:'Kyler Murray',e:'🦅',d:'Minnesota Vikings'},
+{n:'Tua Tagovailoa',e:'🦅',d:'Atlanta Falcons'},
+{n:'Michael Penix Jr.',e:'🦅',d:'Atlanta Falcons'},
+{n:'Bryce Young',e:'🐈',d:'Carolina Panthers'},
+{n:'Jaxson Dart',e:'🗽',d:'New York Giants'},
+{n:'Aaron Rodgers',e:'🏆',d:'Pittsburgh Steelers'},
+{n:'Geno Smith',e:'🟢',d:'New York Jets'},
+{n:'Matthew Stafford',e:'🐰',d:'Los Angeles Rams'},
+{n:'Kirk Cousins',e:'⚔️',d:'Las Vegas Raiders'},
+{n:'Jacoby Brissett',e:'🔱',d:'Arizona Cardinals'},
+{n:'JJ McCarthy',e:'🦅',d:'Minnesota Vikings'},
+{n:'Tyler Shough',e:'⚜️',d:'New Orleans Saints'},
+{n:'Daniel Jones',e:'🐴',d:'Indianapolis Colts'},
+{n:'Justin Fields',e:'🏹',d:'Kansas City Chiefs'},
+{n:'Deshaun Watson',e:'🐶',d:'Cleveland Browns'},
+{n:'Shedeur Sanders',e:'🐶',d:'Cleveland Browns'}
+];
+var RANKER_KEY = 'nfl_qbs';
+var sorted=[],queue=[],current=-1,lo=0,hi=0,qNum=0,history=[],unseen=[];
+
+function mxQ(n){var t=0;for(var i=2;i<=n;i++)t+=Math.ceil(Math.log2(i));return t;}
+function shuf(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=a[i];a[i]=a[j];a[j]=tmp;}}
+function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');}
+
+function startQuiz(){
+  var ix=ITEMS.map(function(_,i){return i;});shuf(ix);
+  sorted=[ix[0]];queue=ix.slice(1);current=-1;qNum=0;history=[];unseen=[];
+  document.getElementById('undo-btn').style.display='none';
+  show('s-quiz');nextInsertion();
+}
+function nextInsertion(){
+  if(queue.length===0){showResults(true);return;}
+  current=queue.shift();lo=0;hi=sorted.length;ask();
+}
+function ask(){
+  if(lo>=hi){sorted.splice(lo,0,current);nextInsertion();return;}
+  var mid=Math.floor((lo+hi)/2),piv=sorted[mid];
+  var ins=ITEMS[current],pv=ITEMS[piv];
+  document.getElementById('vea').textContent=ins.e;
+  document.getElementById('vna').textContent=ins.n;
+  document.getElementById('vda').textContent=ins.d;
+  document.getElementById('veb').textContent=pv.e;
+  document.getElementById('vnb').textContent=pv.n;
+  document.getElementById('vdb').textContent=pv.d;
+  qNum++;
+  var pct=Math.min(97,Math.round((qNum/mxQ(ITEMS.length))*100));
+  document.getElementById('qhint').textContent='Who is the better QB right now? '+queue.length+' still to place.';
+  document.getElementById('qpf').style.width=pct+'%';
+}
+function pick(ch){
+  history.push({sorted:sorted.slice(),queue:queue.slice(),current:current,lo:lo,hi:hi,qNum:qNum,unseen:unseen.slice()});
+  document.getElementById('undo-btn').style.display='';
+  var mid=Math.floor((lo+hi)/2);
+  if(ch==='hi')hi=mid;else lo=mid+1;
+  ask();
+}
+function skipItem(side){
+  history.push({sorted:sorted.slice(),queue:queue.slice(),current:current,lo:lo,hi:hi,qNum:qNum,unseen:unseen.slice()});
+  document.getElementById('undo-btn').style.display='';
+  var mid=Math.floor((lo+hi)/2);
+  if(side==='a'){
+    unseen.push(current);current=-1;lo=0;hi=0;nextInsertion();
+  } else {
+    var pivotIdx=sorted.splice(mid,1)[0];
+    unseen.push(pivotIdx);
+    hi=Math.min(hi,sorted.length);lo=Math.min(lo,sorted.length);
+    ask();
+  }
+}
+function undoPick(){
+  if(history.length===0)return;
+  var h=history.pop();
+  sorted=h.sorted;queue=h.queue;current=h.current;lo=h.lo;hi=h.hi;qNum=h.qNum;unseen=h.unseen;
+  if(history.length===0)document.getElementById('undo-btn').style.display='none';
+  show('s-quiz');ask();
+}
+function showPartial(){
+  var partial=sorted.slice();if(current>=0)partial.push(current);queue.forEach(function(q){partial.push(q);});
+  buildResults(partial,false);
+  document.getElementById('continue-btn').style.display='';
+  show('s-res');
+}
+function continueQuiz(){
+  document.getElementById('continue-btn').style.display='none';
+  show('s-quiz');ask();
+}
+function showResults(complete){
+  buildResults(sorted,complete);
+  if(!complete)document.getElementById('continue-btn').style.display='';
+  show('s-res');
+}
+function buildResults(list,complete){
+  var watched=list.filter(function(i){return unseen.indexOf(i)===-1;});
+  var skippedNote=unseen.length?' '+unseen.length+' skipped.':'';
+  document.getElementById('res-meta').textContent=complete
+    ?(watched.length+' ranked.'+skippedNote)
+    :('Partial — '+queue.length+' still to place.'+skippedNote);
+  var el=document.getElementById('res-list');el.innerHTML='';
+  watched.forEach(function(idx,rank){
+    var item=ITEMS[idx];var row=document.createElement('div');row.className='r-row';
+    var nc=rank<10?'r-num gold':'r-num';
+    row.innerHTML='<div class="'+nc+'">'+(rank+1)+'</div><div class="r-emoji">'+item.e+'</div><div class="r-name">'+item.n+'</div><div class="r-detail">'+item.d+'</div>';
+    el.appendChild(row);
+  });
+  if(unseen.length>0){
+    var div=document.createElement('div');
+    div.style.cssText='margin:20px 0 8px;padding-top:16px;border-top:1px solid var(--b1);';
+    var label=document.createElement('div');
+    label.style.cssText='font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);font-weight:500;margin-bottom:10px';
+    label.textContent=`Haven't Watched`;
+    div.appendChild(label);el.appendChild(div);
+    unseen.forEach(function(idx){
+      var item=ITEMS[idx];var row=document.createElement('div');row.className='r-row';
+      row.innerHTML='<div class="r-num" style="color:var(--mu);font-size:16px">—</div><div class="r-emoji" style="opacity:.4">'+item.e+'</div><div class="r-name" style="color:var(--mu2)">'+item.n+'</div><div class="r-detail">'+item.d+'</div>';
+      el.appendChild(row);
+    });
+  }
+}
+function getSaves(){try{return JSON.parse(localStorage.getItem('tg_saves_'+RANKER_KEY)||'[]');}catch(e){return[];}}
+function putSaves(arr){localStorage.setItem('tg_saves_'+RANKER_KEY,JSON.stringify(arr));}
+function saveRanking(){
+  var name=document.getElementById('save-name-input').value.trim()||
+    new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  var rows=document.querySelectorAll('#res-list .r-row');
+  var items=[];
+  rows.forEach(function(row){
+    var nameEl=row.querySelector('.r-name');var numEl=row.querySelector('.r-num');var emojiEl=row.querySelector('.r-emoji');
+    if(nameEl&&numEl&&numEl.textContent.indexOf('—')===-1)
+      items.push({rank:parseInt(numEl.textContent)||0,name:nameEl.textContent.trim(),emoji:emojiEl?emojiEl.textContent.trim():''});
+  });
+  if(items.length===0)return;
+  var saves=getSaves();
+  saves.unshift({id:Date.now(),name:name,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),items:items});
+  putSaves(saves);
+  document.getElementById('save-name-input').value='';
+  var btn=document.getElementById('save-ranking-btn');
+  btn.textContent='✓ Saved!';btn.style.color='var(--green)';
+  setTimeout(function(){btn.textContent='Save Ranking';btn.style.color='';},1800);
+}
+function openSavedModal(){renderSavedModal();document.getElementById('saved-modal-bg').classList.add('open');}
+function closeSavedModal(){document.getElementById('saved-modal-bg').classList.remove('open');}
+document.getElementById('saved-modal-bg').addEventListener('click',function(e){if(e.target===e.currentTarget)closeSavedModal();});
+function deleteSave(id){putSaves(getSaves().filter(function(s){return s.id!==id;}));renderSavedModal();}
+function renderSavedModal(){
+  var saves=getSaves();var body=document.getElementById('saved-modal-body');
+  if(saves.length===0){body.innerHTML='<div class="no-saves">No saved rankings yet.</div>';return;}
+  var html='';
+  saves.forEach(function(s){
+    html+='<div class="saved-entry"><div class="saved-entry-hdr"><div><div class="saved-entry-name">'+s.name+'</div><div class="saved-entry-date">'+s.date+'</div></div><button class="saved-entry-del" onclick="deleteSave('+s.id+')">&#215;</button></div><div class="saved-entry-list">';
+    s.items.forEach(function(item){
+      html+='<div class="saved-item-row"><div class="saved-item-num'+(item.rank<=10?' g':'')+'">'+item.rank+'</div>'+(item.emoji?'<span style="font-size:15px">'+item.emoji+'</span>':'')+'<div class="saved-item-name">'+item.name+'</div></div>';
+    });
+    html+='</div></div>';
+  });
+  body.innerHTML=html;
+}
+
+</script>
+</body>
+</html>
