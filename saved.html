@@ -10,75 +10,61 @@
 :root{--bg:#080808;--s1:#111;--s2:#181818;--s3:#222;--b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.14);--b3:rgba(255,255,255,.22);--tx:#f0f0f0;--mu:#555;--mu2:#888;--ac:#e8c84a;--ac2:#c4a832;--red:#e85a4a;--green:#4acd8d;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;}
-
 nav{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--b1);}
 .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
 .nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--ac);}
+.nav-links{display:flex;gap:8px;}
 .nav-link{font-size:12px;color:var(--mu2);text-decoration:none;letter-spacing:.04em;padding:6px 14px;border:1px solid var(--b2);border-radius:6px;transition:color .12s,border-color .12s;}
 .nav-link:hover{color:var(--tx);border-color:var(--b3);}
 .nav-link.active{color:var(--ac);border-color:rgba(232,200,74,.4);}
-
 .main{max-width:860px;margin:0 auto;padding:48px 32px 80px;}
-
 .page-title{font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:3px;line-height:.95;margin-bottom:6px;}
 .page-title em{color:var(--ac);font-style:normal;}
 .page-sub{font-size:13px;color:var(--mu2);margin-bottom:36px;}
-
-/* FILTER TABS */
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
 .ftab{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:500;letter-spacing:.04em;cursor:pointer;border:1px solid var(--b2);background:transparent;color:var(--mu2);font-family:'DM Sans',sans-serif;transition:all .12s;}
 .ftab:hover{color:var(--tx);border-color:var(--b3);}
 .ftab.on{background:var(--ac);color:#000;border-color:var(--ac);}
-
-/* SAVES */
 .saves-list{display:flex;flex-direction:column;gap:14px;}
-
 .save-card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;overflow:hidden;transition:border-color .12s;}
 .save-card:hover{border-color:var(--b2);}
-
-.save-card-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--b1);gap:12px;cursor:pointer;}
-.save-card-hdr:hover .save-title{color:var(--ac);}
+.save-card-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;gap:12px;cursor:pointer;}
 .save-left{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
 .save-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--tx);transition:color .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.save-meta{font-size:11px;color:var(--mu);display:flex;gap:10px;align-items:center;}
+.save-card-hdr:hover .save-title{color:var(--ac);}
+.save-meta{font-size:11px;color:var(--mu);display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
 .save-ranker-tag{background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:2px 7px;font-size:10px;color:var(--mu2);letter-spacing:.04em;}
 .save-card-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .rerank-btn{padding:7px 14px;background:var(--ac);color:#000;border:none;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:opacity .12s;}
 .rerank-btn:hover{opacity:.85;}
 .del-btn{background:none;border:none;color:var(--mu);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1;}
-.del-btn:hover{color:var(--red);background:rgba(232,90,74,.08);}
-.chevron{font-size:12px;color:var(--mu);transition:transform .18s;}
+.del-btn:hover{color:var(--red);}
+.chevron{font-size:11px;color:var(--mu);transition:transform .18s;user-select:none;}
 .chevron.open{transform:rotate(180deg);}
-
-.save-card-body{display:none;padding:16px 20px;}
+.save-card-body{display:none;padding:0 20px 16px;}
 .save-card-body.open{display:block;}
-
-.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px 16px;}
-.item-row{display:flex;align-items:baseline;gap:8px;padding:4px 0;border-bottom:.5px solid var(--b1);font-size:13px;}
+.divider{border:none;border-top:1px solid var(--b1);margin-bottom:16px;}
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:2px 16px;}
+.item-row{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:.5px solid var(--b1);font-size:13px;}
 .item-row:last-child{border-bottom:none;}
 .item-num{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--mu);min-width:28px;text-align:right;line-height:1;}
 .item-num.g{color:var(--ac);}
-.item-name{color:var(--tx);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .item-emoji{font-size:14px;min-width:20px;}
-
+.item-name{color:var(--tx);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .pos-section{margin-top:16px;padding-top:16px;border-top:1px solid var(--b1);}
-.pos-section-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);font-weight:500;margin-bottom:12px;}
+.pos-section-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);font-weight:500;margin-bottom:12px;}
 .pos-group{margin-bottom:14px;}
-.pos-group-label{font-size:11px;font-weight:500;color:var(--ac);margin-bottom:6px;letter-spacing:.04em;}
-
+.pos-group-lbl{font-size:11px;font-weight:500;color:var(--ac);margin-bottom:6px;letter-spacing:.04em;}
 .empty-state{text-align:center;padding:80px 32px;color:var(--mu);}
-.empty-icon{font-size:48px;margin-bottom:16px;}
+.empty-icon{font-size:52px;margin-bottom:16px;}
 .empty-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--mu2);margin-bottom:8px;}
 .empty-sub{font-size:13px;line-height:1.7;}
 .empty-sub a{color:var(--ac);text-decoration:none;}
-.empty-sub a:hover{text-decoration:underline;}
-
 footer{border-top:1px solid var(--b1);padding:24px 32px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--mu);}
 .footer-logo{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--ac);opacity:.6;}
 </style>
 </head>
 <body>
-
 <nav>
   <a class="nav-logo" href="index.html">
     <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
@@ -96,20 +82,16 @@ footer{border-top:1px solid var(--b1);padding:24px 32px;display:flex;align-items
     </svg>
     <span class="nav-logo-text">TierGoat</span>
   </a>
-  <div style="display:flex;gap:8px;align-items:center;">
-    <a class="nav-link" href="index.html">All Rankers</a>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">Home</a>
     <a class="nav-link active" href="saved.html">My Rankings</a>
   </div>
 </nav>
 
 <div class="main">
   <div class="page-title">My <em>Saved</em><br>Rankings</div>
-  <p class="page-sub">All your rankings across every list — tap any to expand, or rank again to remix.</p>
-
-  <div class="filter-row" id="filter-row">
-    <button class="ftab on" onclick="setFilter('all')">All</button>
-  </div>
-
+  <p class="page-sub">All your rankings across every list — tap any to expand, or rank again.</p>
+  <div class="filter-row" id="filter-row"></div>
   <div class="saves-list" id="saves-list"></div>
 </div>
 
@@ -119,147 +101,161 @@ footer{border-top:1px solid var(--b1);padding:24px 32px;display:flex;align-items
 </footer>
 
 <script>
-const RANKERS = [{"key": "nba", "label": "NBA All-Time Top 50", "url": "nba.html"}, {"key": "nfl", "label": "NFL QBs", "url": "nfl.html"}, {"key": "oscars", "label": "Best Picture", "url": "oscars.html"}, {"key": "fastfood", "label": "Fast Food", "url": "fastfood.html"}, {"key": "sitcoms", "label": "Best Sitcoms", "url": "sitcoms.html"}, {"key": "music_2010s", "label": "Best Artists 2010s", "url": "music_2010s.html"}, {"key": "music_2020s", "label": "Best Artists 2020s", "url": "music_2020s.html"}, {"key": "pizza", "label": "Pizza Toppings", "url": "pizza.html"}, {"key": "cuisines", "label": "Cultural Cuisines", "url": "cuisines.html"}, {"key": "rappers", "label": "Best Rappers", "url": "rappers.html"}, {"key": "custom", "label": "Custom", "url": "custom.html"}];
+var RANKERS = [
+  {key:"nba",         label:"NBA All-Time Top 50",  url:"nba.html"},
+  {key:"nfl",         label:"NFL QBs",              url:"nfl.html"},
+  {key:"oscars",      label:"Best Picture",          url:"oscars.html"},
+  {key:"fastfood",    label:"Fast Food",             url:"fastfood.html"},
+  {key:"sitcoms",     label:"Best Sitcoms",          url:"sitcoms.html"},
+  {key:"music_2010s", label:"Best Artists 2010s",   url:"music_2010s.html"},
+  {key:"music_2020s", label:"Best Artists 2020s",   url:"music_2020s.html"},
+  {key:"pizza",       label:"Pizza Toppings",        url:"pizza.html"},
+  {key:"cuisines",    label:"Cultural Cuisines",     url:"cuisines.html"},
+  {key:"rappers",     label:"Best Rappers",          url:"rappers.html"},
+  {key:"custom",      label:"Custom",                url:"custom.html"}
+];
 
-// Load all saves from every ranker
+var activeFilter = "all";
+
 function loadAllSaves() {
-  const all = [];
-  RANKERS.forEach(r => {
+  var all = [];
+  RANKERS.forEach(function(r) {
     try {
-      const saves = JSON.parse(localStorage.getItem('tg_saves_' + r.key) || '[]');
-      saves.forEach(s => {
-        all.push({...s, rankerKey: r.key, rankerLabel: r.label, rankerUrl: r.url});
+      var raw = localStorage.getItem("tg_saves_" + r.key);
+      var saves = raw ? JSON.parse(raw) : [];
+      saves.forEach(function(s) {
+        var entry = {};
+        Object.keys(s).forEach(function(k){ entry[k] = s[k]; });
+        entry.rankerKey   = r.key;
+        entry.rankerLabel = r.label;
+        entry.rankerUrl   = r.url;
+        all.push(entry);
       });
     } catch(e) {}
   });
-  // Sort by most recent first
-  all.sort((a,b) => b.id - a.id);
+  all.sort(function(a,b){ return b.id - a.id; });
   return all;
 }
 
 function deleteSave(rankerKey, id) {
   try {
-    const saves = JSON.parse(localStorage.getItem('tg_saves_' + rankerKey) || '[]');
-    const updated = saves.filter(s => s.id !== id);
-    localStorage.setItem('tg_saves_' + rankerKey, JSON.stringify(updated));
+    var raw = localStorage.getItem("tg_saves_" + rankerKey);
+    var saves = raw ? JSON.parse(raw) : [];
+    var updated = saves.filter(function(s){ return s.id !== id; });
+    localStorage.setItem("tg_saves_" + rankerKey, JSON.stringify(updated));
   } catch(e) {}
   render();
 }
 
 function toggleBody(id) {
-  const body = document.getElementById('body-' + id);
-  const chev = document.getElementById('chev-' + id);
+  var body = document.getElementById("body-" + id);
+  var chev = document.getElementById("chev-" + id);
   if (!body) return;
-  body.classList.toggle('open');
-  chev.classList.toggle('open');
+  if (body.classList.contains("open")) {
+    body.classList.remove("open");
+    chev.classList.remove("open");
+  } else {
+    body.classList.add("open");
+    chev.classList.add("open");
+  }
 }
 
-let activeFilter = 'all';
 function setFilter(key) {
   activeFilter = key;
-  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('on'));
-  document.querySelectorAll('.ftab').forEach(t => {
-    if (t.dataset.key === key || (key === 'all' && t.dataset.key === undefined)) t.classList.add('on');
-  });
   render();
 }
 
 function buildFilterTabs(saves) {
-  const row = document.getElementById('filter-row');
-  // Find which rankers have saves
-  const keys = [...new Set(saves.map(s => s.rankerKey))];
-  // Rebuild tabs: All + one per ranker with saves
-  row.innerHTML = '<button class="ftab' + (activeFilter==='all'?' on':'') + '" onclick="setFilter('all')">All</button>';
-  keys.forEach(k => {
-    const r = RANKERS.find(r => r.key === k);
-    if (!r) return;
-    const active = activeFilter === k ? ' on' : '';
-    row.innerHTML += `<button class="ftab${active}" data-key="${k}" onclick="setFilter('${k}')">${r.label}</button>`;
+  var row = document.getElementById("filter-row");
+  var keys = [];
+  saves.forEach(function(s) {
+    if (keys.indexOf(s.rankerKey) === -1) keys.push(s.rankerKey);
   });
+
+  var html = "";
+  var allClass = activeFilter === "all" ? " on" : "";
+  html += '<button class="ftab' + allClass + '" onclick="setFilter(\'all\')">All</button>';
+
+  keys.forEach(function(k) {
+    var r = null;
+    RANKERS.forEach(function(rr){ if(rr.key === k) r = rr; });
+    if (!r) return;
+    var cls = activeFilter === k ? " on" : "";
+    html += '<button class="ftab' + cls + '" onclick="setFilter(\'' + k + '\')">' + r.label + '</button>';
+  });
+
+  row.innerHTML = html;
 }
 
 function buildItemsHtml(save) {
-  // Main items list
-  let html = '<div class="items-grid">';
-  (save.items || []).forEach(item => {
-    const g = item.rank <= 10 ? 'g' : '';
-    html += `<div class="item-row">
-      <div class="item-num ${g}">${item.rank}</div>
-      ${item.emoji ? `<div class="item-emoji">${item.emoji}</div>` : ''}
-      <div class="item-name">${item.name}</div>
-    </div>`;
+  var html = '<div class="items-grid">';
+  var items = save.items || [];
+  items.forEach(function(item) {
+    var g = item.rank <= 10 ? " g" : "";
+    var emoji = item.emoji ? '<div class="item-emoji">' + item.emoji + "</div>" : "";
+    html += '<div class="item-row"><div class="item-num' + g + '">' + item.rank + "</div>" + emoji + '<div class="item-name">' + item.name + "</div></div>";
   });
-  html += '</div>';
+  html += "</div>";
 
-  // Positional breakdowns for NBA top-50 saves
-  if (save.type === 'top50' && save.posBreakdowns && Object.keys(save.posBreakdowns).length) {
-    html += '<div class="pos-section"><div class="pos-section-title">By Position</div>';
-    Object.values(save.posBreakdowns).forEach(pb => {
-      html += `<div class="pos-group"><div class="pos-group-label">${pb.label}</div><div class="items-grid">`;
-      pb.players.forEach(p => {
-        const g = p.rank <= 5 ? 'g' : '';
-        html += `<div class="item-row"><div class="item-num ${g}">${p.rank}</div><div class="item-name">${p.name}</div></div>`;
+  // NBA top-50 positional breakdowns
+  if (save.type === "top50" && save.posBreakdowns) {
+    var pbs = Object.values ? Object.values(save.posBreakdowns) : Object.keys(save.posBreakdowns).map(function(k){ return save.posBreakdowns[k]; });
+    if (pbs.length > 0) {
+      html += '<div class="pos-section"><div class="pos-section-lbl">By Position</div>';
+      pbs.forEach(function(pb) {
+        html += '<div class="pos-group"><div class="pos-group-lbl">' + pb.label + '</div><div class="items-grid">';
+        pb.players.forEach(function(p) {
+          var g = p.rank <= 5 ? " g" : "";
+          html += '<div class="item-row"><div class="item-num' + g + '">' + p.rank + '</div><div class="item-name">' + p.name + "</div></div>";
+        });
+        html += "</div></div>";
       });
-      html += '</div></div>';
-    });
-    html += '</div>';
+      html += "</div>";
+    }
   }
   return html;
 }
 
-function getRerankUrl(save) {
-  // For NBA position saves, link to NBA with a fragment so it could jump to that pos
-  // For everything else just link to the ranker
-  return save.rankerUrl;
-}
-
 function render() {
-  const all = loadAllSaves();
+  var all = loadAllSaves();
   buildFilterTabs(all);
 
-  const filtered = activeFilter === 'all' ? all : all.filter(s => s.rankerKey === activeFilter);
-  const list = document.getElementById('saves-list');
+  var filtered = activeFilter === "all" ? all : all.filter(function(s){ return s.rankerKey === activeFilter; });
+  var list = document.getElementById("saves-list");
 
   if (filtered.length === 0) {
-    const msg = activeFilter === 'all'
-      ? `You haven't saved any rankings yet.<br>Head to <a href="index.html">a ranker</a> and complete a ranking to save it here.`
-      : `No saved rankings for this category yet.`;
-    list.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">🐐</div>
-      <div class="empty-title">Nothing Here Yet</div>
-      <div class="empty-sub">${msg}</div>
-    </div>`;
+    var msg = activeFilter === "all"
+      ? "You haven't saved any rankings yet.<br>Head to <a href=\"index.html\">a ranker</a> and complete a ranking to save it here."
+      : "No saved rankings for this category yet.";
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83D\uDC10</div><div class="empty-title">Nothing Here Yet</div><div class="empty-sub">' + msg + "</div></div>";
     return;
   }
 
-  list.innerHTML = filtered.map(s => {
-    const subtitle = [
-      s.date,
-      s.rankerLabel,
-      s.type === 'top50' ? 'Top 50' : s.type === 'position' ? s.posLabel : null
-    ].filter(Boolean).join(' · ');
+  var html = "";
+  filtered.forEach(function(s) {
+    var count = (s.items || []).length;
+    var subtitle = s.date + " \u00B7 " + s.rankerLabel;
+    if (s.type === "top50") subtitle += " \u00B7 Top 50";
+    if (s.type === "position" && s.posLabel) subtitle += " \u00B7 " + s.posLabel;
 
-    return `<div class="save-card">
-      <div class="save-card-hdr" onclick="toggleBody(${s.id})">
-        <div class="save-left">
-          <div class="save-title">${s.name}</div>
-          <div class="save-meta">
-            <span class="save-ranker-tag">${s.rankerLabel}</span>
-            <span>${s.date}</span>
-            <span>${(s.items||[]).length} ranked</span>
-          </div>
-        </div>
-        <div class="save-card-actions">
-          <button class="rerank-btn" onclick="event.stopPropagation();window.location.href='${getRerankUrl(s)}'">Rank Again &#8594;</button>
-          <button class="del-btn" onclick="event.stopPropagation();deleteSave('${s.rankerKey}',${s.id})" title="Delete">&#215;</button>
-          <span class="chevron" id="chev-${s.id}">&#9660;</span>
-        </div>
-      </div>
-      <div class="save-card-body" id="body-${s.id}">
-        ${buildItemsHtml(s)}
-      </div>
-    </div>`;
-  }).join('');
+    html += '<div class="save-card">';
+    html += '<div class="save-card-hdr" onclick="toggleBody(' + s.id + ')">';
+    html += '<div class="save-left">';
+    html += '<div class="save-title">' + s.name + "</div>";
+    html += '<div class="save-meta"><span class="save-ranker-tag">' + s.rankerLabel + "</span><span>" + s.date + "</span><span>" + count + " ranked</span></div>";
+    html += "</div>";
+    html += '<div class="save-card-actions">';
+    html += '<button class="rerank-btn" onclick="event.stopPropagation();window.location.href=\'' + s.rankerUrl + '\'">Rank Again &#8594;</button>';
+    html += '<button class="del-btn" onclick="event.stopPropagation();deleteSave(\'' + s.rankerKey + '\',' + s.id + ')" title="Delete">&#215;</button>';
+    html += '<span class="chevron" id="chev-' + s.id + '">&#9660;</span>';
+    html += "</div></div>";
+    html += '<div class="save-card-body" id="body-' + s.id + '">';
+    html += '<hr class="divider">';
+    html += buildItemsHtml(s);
+    html += "</div></div>";
+  });
+
+  list.innerHTML = html;
 }
 
 render();
