@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TierGoat — NFL Best Current WRs</title>
+<title>TierGoat &#8212; Best Current NFL WRs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -26,16 +26,13 @@
 .pfill{height:100%;background:var(--ac);border-radius:1px;transition:width .22s;}
 .q-hint{font-size:12px;color:var(--mu2);margin-bottom:16px;min-height:30px;line-height:1.55;}
 .vs{display:flex;gap:8px;margin-bottom:10px;}
-.vc-wrap{flex:1;display:flex;flex-direction:column;gap:6px;}
-.vc{background:var(--s1);border:1px solid var(--b2);border-radius:12px;padding:20px 14px;cursor:pointer;text-align:center;transition:border-color .12s,background .12s,transform .1s;position:relative;overflow:hidden;}
-.vc::after{content:'';position:absolute;inset:0;background:var(--ac);opacity:0;transition:opacity .12s;}
+.vc{flex:1;background:var(--s1);border:1px solid var(--b2);border-radius:12px;padding:22px 14px;cursor:pointer;text-align:center;transition:border-color .12s,background .12s,transform .1s;position:relative;overflow:hidden;}
+.vc::after{content:'';position:absolute;inset:0;background:var(--ac);opacity:0;transition:opacity .12s;pointer-events:none;}
 .vc:hover{border-color:var(--ac);background:var(--s2);}.vc:hover::after{opacity:.04;}.vc:active{transform:scale(.97);}
-.vc-emoji{font-size:28px;margin-bottom:6px;line-height:1.2;position:relative;}
-.vc-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--tx);margin-bottom:3px;position:relative;}
+.vc-emoji{font-size:30px;margin-bottom:6px;line-height:1.2;position:relative;}
+.vc-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1px;color:var(--tx);margin-bottom:3px;position:relative;}
 .vc-detail{font-size:11px;color:var(--mu);position:relative;}
 .vs-sep{display:flex;align-items:center;justify-content:center;width:24px;flex-shrink:0;font-size:11px;color:var(--mu);font-weight:500;}
-.hwb{width:100%;padding:6px 8px;background:transparent;border:1px solid var(--b1);border-radius:6px;color:var(--mu);font-size:10px;letter-spacing:.04em;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .12s,border-color .12s;}
-.hwb:hover{color:var(--tx);border-color:var(--b2);}
 .btn-actions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
 .cmp-btn{background:var(--s2);border:1px solid var(--b2);color:var(--mu2);border-radius:6px;padding:5px 11px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;}
 .cmp-btn:hover{color:var(--tx);border-color:var(--b3);}
@@ -89,36 +86,28 @@
   <a href="index.html" class="hdr-back">&#8592; All Rankers</a>
 </div>
 <div class="main">
-
 <div class="screen active" id="s-home">
   <div class="h-title">Best Current<br><em>NFL</em><br>Wide Receivers</div>
-  <p class="h-desc">The top pass-catchers in the game today. Who is the best WR in the league right now?</p>
+  <p class="h-desc">The top pass-catchers in the game today. Who is the best WR right now?</p>
   <p class="h-meta"><span>41 receivers</span></p>
   <div class="btn-row"><button class="btn btn-p" onclick="startQuiz()">Start Ranking</button></div>
   <div class="btn-row" style="margin-top:10px"><button class="save-btn" onclick="openSavedModal()">View Saved Rankings</button></div>
 </div>
-
 <div class="screen" id="s-quiz">
   <div class="q-lbl">Current NFL WRs</div>
   <div class="pbar"><div class="pfill" id="qpf" style="width:0%"></div></div>
   <div class="q-hint" id="qhint"></div>
   <div class="vs">
-    <div class="vc-wrap">
-      <div class="vc" onclick="pick('hi')">
-        <div class="vc-emoji" id="vea">&mdash;</div>
-        <div class="vc-name" id="vna">&mdash;</div>
-        <div class="vc-detail" id="vda">&mdash;</div>
-      </div>
-      <button class="hwb" onclick="skipItem('a')">Haven't Watched &#8594;</button>
+    <div class="vc" onclick="pick('hi')">
+      <div class="vc-emoji" id="vea">-</div>
+      <div class="vc-name" id="vna">-</div>
+      <div class="vc-detail" id="vda">-</div>
     </div>
     <div class="vs-sep">vs</div>
-    <div class="vc-wrap">
-      <div class="vc" onclick="pick('lo')">
-        <div class="vc-emoji" id="veb">&mdash;</div>
-        <div class="vc-name" id="vnb">&mdash;</div>
-        <div class="vc-detail" id="vdb">&mdash;</div>
-      </div>
-      <button class="hwb" onclick="skipItem('b')">Haven't Watched &#8594;</button>
+    <div class="vc" onclick="pick('lo')">
+      <div class="vc-emoji" id="veb">-</div>
+      <div class="vc-name" id="vnb">-</div>
+      <div class="vc-detail" id="vdb">-</div>
     </div>
   </div>
   <div class="btn-actions">
@@ -128,13 +117,12 @@
     <button class="btn btn-g btn-sm" onclick="showPartial()">See ranking so far</button>
   </div>
 </div>
-
 <div class="screen" id="s-res">
   <div class="res-title">Your Ranking</div>
   <div class="res-meta" id="res-meta"></div>
   <div id="res-list"></div>
   <div class="save-name-row" style="margin-top:20px">
-    <input class="save-input" id="save-name-input" placeholder="Name this ranking (optional)&#8230;" maxlength="40">
+    <input class="save-input" id="save-name-input" placeholder="Name this ranking&#8230;" maxlength="40">
     <button class="save-btn" id="save-ranking-btn" onclick="saveRanking()">Save Ranking</button>
   </div>
   <div class="btn-row" style="margin-top:8px">
@@ -142,10 +130,8 @@
     <button class="btn btn-g" id="continue-btn" style="display:none" onclick="continueQuiz()">Keep going</button>
   </div>
 </div>
-
 </div>
 </div>
-
 <div class="saved-modal-bg" id="saved-modal-bg">
   <div class="saved-modal">
     <div class="saved-modal-hdr">
@@ -155,64 +141,60 @@
     <div class="saved-modal-body" id="saved-modal-body"></div>
   </div>
 </div>
-
 <script>
-
-var ITEMS = [
-{n:'Justin Jefferson',e:'🏈',d:'Minnesota Vikings'},
-{n:"Ja'Marr Chase",e:'🐯',d:'Cincinnati Bengals'},
-{n:'CeeDee Lamb',e:'⭐',d:'Dallas Cowboys'},
-{n:'Tyreek Hill',e:'💨',d:'Miami Dolphins'},
-{n:'AJ Brown',e:'🦅',d:'Philadelphia Eagles'},
-{n:'Amon-Ra St. Brown',e:'\u2600\uFE0F',d:'Detroit Lions'},
-{n:'Jaylen Waddle',e:'🐴',d:'Denver Broncos'},
-{n:'DK Metcalf',e:'🔪',d:'Pittsburgh Steelers'},
-{n:'Deebo Samuel',e:'🏈',d:'San Francisco 49ers'},
-{n:'Mike Evans',e:'🏈',d:'San Francisco 49ers'},
-{n:'Puka Nacua',e:'🐰',d:'Los Angeles Rams'},
-{n:'Drake London',e:'🦅',d:'Atlanta Falcons'},
-{n:'Garrett Wilson',e:'🟢',d:'New York Jets'},
-{n:'Brian Thomas Jr.',e:'🐆',d:'Jacksonville Jaguars'},
-{n:'Courtland Sutton',e:'🐴',d:'Denver Broncos'},
-{n:'Tee Higgins',e:'🐯',d:'Cincinnati Bengals'},
-{n:'Terry McLaurin',e:'🐺',d:'Washington Commanders'},
-{n:'DeVonta Smith',e:'🦅',d:'Philadelphia Eagles'},
-{n:'Zay Flowers',e:'🦅',d:'Baltimore Ravens'},
-{n:'Marvin Harrison Jr.',e:'🔱',d:'Arizona Cardinals'},
-{n:'Chris Olave',e:'\u269C\uFE0F',d:'New Orleans Saints'},
-{n:"Wan'Dale Robinson",e:'🐯',d:'Tennessee Titans'},
-{n:'Michael Pittman Jr.',e:'🔱',d:'Pittsburgh Steelers'},
-{n:'DJ Moore',e:'🦬',d:'Buffalo Bills'},
-{n:'Jaxon Smith-Njigba',e:'🦅',d:'Seattle Seahawks'},
-{n:'Romeo Doubs',e:'🦅',d:'New England Patriots'},
-{n:'Alec Pierce',e:'🐴',d:'Indianapolis Colts'},
-{n:'Rashee Rice',e:'🏹',d:'Kansas City Chiefs'},
-{n:'Xavier Worthy',e:'🏹',d:'Kansas City Chiefs'},
-{n:'Ladd McConkey',e:'⚡',d:'Los Angeles Chargers'},
-{n:'Davante Adams',e:'🐰',d:'Los Angeles Rams'},
-{n:'Jakobi Meyers',e:'\u2694\uFE0F',d:'Las Vegas Raiders'},
-{n:'Parker Washington',e:'🐆',d:'Jacksonville Jaguars'},
-{n:'Luther Burden',e:'🐻',d:'Chicago Bears'},
-{n:'Rome Odunze',e:'🐻',d:'Chicago Bears'},
-{n:'Tez McMillan',e:'🐈',d:'Carolina Panthers'},
-{n:'Christian Watson',e:'🧀',d:'Green Bay Packers'},
-{n:'Jayden Reed',e:'🧀',d:'Green Bay Packers'},
-{n:'Emeka Egbuka',e:'\u2620\uFE0F',d:'Tampa Bay Buccaneers'},
-{n:'Jahan Dotson',e:'🦅',d:'Atlanta Falcons'},
-{n:'Rashid Shaheed',e:'🦅',d:'Seattle Seahawks'}
+var ITEMS=[
+  {n:'Justin Jefferson',e:'🏈',d:'Minnesota Vikings'},
+  {n:'Ja\'Marr Chase',e:'🐯',d:'Cincinnati Bengals'},
+  {n:'CeeDee Lamb',e:'⭐',d:'Dallas Cowboys'},
+  {n:'Tyreek Hill',e:'💨',d:'Miami Dolphins'},
+  {n:'AJ Brown',e:'🦅',d:'Philadelphia Eagles'},
+  {n:'Amon-Ra St. Brown',e:'☀️',d:'Detroit Lions'},
+  {n:'Jaylen Waddle',e:'🐴',d:'Denver Broncos'},
+  {n:'DK Metcalf',e:'🔪',d:'Pittsburgh Steelers'},
+  {n:'Deebo Samuel',e:'🏈',d:'San Francisco 49ers'},
+  {n:'Mike Evans',e:'🏈',d:'San Francisco 49ers'},
+  {n:'Puka Nacua',e:'🐰',d:'Los Angeles Rams'},
+  {n:'Drake London',e:'🦅',d:'Atlanta Falcons'},
+  {n:'Garrett Wilson',e:'🟢',d:'New York Jets'},
+  {n:'Brian Thomas Jr.',e:'🐆',d:'Jacksonville Jaguars'},
+  {n:'Courtland Sutton',e:'🐴',d:'Denver Broncos'},
+  {n:'Tee Higgins',e:'🐯',d:'Cincinnati Bengals'},
+  {n:'Terry McLaurin',e:'🐺',d:'Washington Commanders'},
+  {n:'DeVonta Smith',e:'🦅',d:'Philadelphia Eagles'},
+  {n:'Zay Flowers',e:'🦅',d:'Baltimore Ravens'},
+  {n:'Marvin Harrison Jr.',e:'🔱',d:'Arizona Cardinals'},
+  {n:'Chris Olave',e:'🌙',d:'New Orleans Saints'},
+  {n:'Wan\'Dale Robinson',e:'🐯',d:'Tennessee Titans'},
+  {n:'Michael Pittman Jr.',e:'🔪',d:'Pittsburgh Steelers'},
+  {n:'DJ Moore',e:'🦬',d:'Buffalo Bills'},
+  {n:'Jaxon Smith-Njigba',e:'🦅',d:'Seattle Seahawks'},
+  {n:'Romeo Doubs',e:'🦅',d:'New England Patriots'},
+  {n:'Alec Pierce',e:'🐴',d:'Indianapolis Colts'},
+  {n:'Rashee Rice',e:'🏹',d:'Kansas City Chiefs'},
+  {n:'Xavier Worthy',e:'🏹',d:'Kansas City Chiefs'},
+  {n:'Ladd McConkey',e:'⚡',d:'Los Angeles Chargers'},
+  {n:'Davante Adams',e:'🐰',d:'Los Angeles Rams'},
+  {n:'Jakobi Meyers',e:'🗡',d:'Las Vegas Raiders'},
+  {n:'Parker Washington',e:'🐆',d:'Jacksonville Jaguars'},
+  {n:'Luther Burden',e:'🐻',d:'Chicago Bears'},
+  {n:'Rome Odunze',e:'🐻',d:'Chicago Bears'},
+  {n:'Tez McMillan',e:'🐈',d:'Carolina Panthers'},
+  {n:'Christian Watson',e:'🧀',d:'Green Bay Packers'},
+  {n:'Jayden Reed',e:'🧀',d:'Green Bay Packers'},
+  {n:'Emeka Egbuka',e:'🏴',d:'Tampa Bay Buccaneers'},
+  {n:'Jahan Dotson',e:'🦅',d:'Atlanta Falcons'},
+  {n:'Rashid Shaheed',e:'🦅',d:'Seattle Seahawks'}
 ];
-var RANKER_KEY = 'nfl_wrs';
-var sorted=[],queue=[],current=-1,lo=0,hi=0,qNum=0,history=[],unseen=[];
-
+var RANKER_KEY="nfl_wrs";
+var sorted=[],queue=[],current=-1,lo=0,hi=0,qNum=0,history=[];
 function mxQ(n){var t=0;for(var i=2;i<=n;i++)t+=Math.ceil(Math.log2(i));return t;}
 function shuf(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=a[i];a[i]=a[j];a[j]=tmp;}}
-function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById(id).classList.add('active');}
-
+function show(id){document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});document.getElementById(id).classList.add("active");}
 function startQuiz(){
   var ix=ITEMS.map(function(_,i){return i;});shuf(ix);
-  sorted=[ix[0]];queue=ix.slice(1);current=-1;qNum=0;history=[];unseen=[];
-  document.getElementById('undo-btn').style.display='none';
-  show('s-quiz');nextInsertion();
+  sorted=[ix[0]];queue=ix.slice(1);current=-1;qNum=0;history=[];
+  document.getElementById("undo-btn").style.display="none";
+  show("s-quiz");nextInsertion();
 }
 function nextInsertion(){
   if(queue.length===0){showResults(true);return;}
@@ -222,125 +204,92 @@ function ask(){
   if(lo>=hi){sorted.splice(lo,0,current);nextInsertion();return;}
   var mid=Math.floor((lo+hi)/2),piv=sorted[mid];
   var ins=ITEMS[current],pv=ITEMS[piv];
-  document.getElementById('vea').textContent=ins.e;
-  document.getElementById('vna').textContent=ins.n;
-  document.getElementById('vda').textContent=ins.d;
-  document.getElementById('veb').textContent=pv.e;
-  document.getElementById('vnb').textContent=pv.n;
-  document.getElementById('vdb').textContent=pv.d;
+  document.getElementById("vea").textContent=ins.e;
+  document.getElementById("vna").textContent=ins.n;
+  document.getElementById("vda").textContent=ins.d;
+  document.getElementById("veb").textContent=pv.e;
+  document.getElementById("vnb").textContent=pv.n;
+  document.getElementById("vdb").textContent=pv.d;
   qNum++;
   var pct=Math.min(97,Math.round((qNum/mxQ(ITEMS.length))*100));
-  document.getElementById('qhint').textContent='Who is the better WR right now? '+queue.length+' still to place.';
-  document.getElementById('qpf').style.width=pct+'%';
+  document.getElementById("qhint").textContent="Who is the better WR right now? "+queue.length+" still to place.";
+  document.getElementById("qpf").style.width=pct+"%";
 }
 function pick(ch){
-  history.push({sorted:sorted.slice(),queue:queue.slice(),current:current,lo:lo,hi:hi,qNum:qNum,unseen:unseen.slice()});
-  document.getElementById('undo-btn').style.display='';
+  history.push({sorted:sorted.slice(),queue:queue.slice(),current:current,lo:lo,hi:hi,qNum:qNum});
+  document.getElementById("undo-btn").style.display="";
   var mid=Math.floor((lo+hi)/2);
-  if(ch==='hi')hi=mid;else lo=mid+1;
+  if(ch==="hi")hi=mid;else lo=mid+1;
   ask();
-}
-function skipItem(side){
-  history.push({sorted:sorted.slice(),queue:queue.slice(),current:current,lo:lo,hi:hi,qNum:qNum,unseen:unseen.slice()});
-  document.getElementById('undo-btn').style.display='';
-  var mid=Math.floor((lo+hi)/2);
-  if(side==='a'){
-    unseen.push(current);current=-1;lo=0;hi=0;nextInsertion();
-  } else {
-    var pivotIdx=sorted.splice(mid,1)[0];
-    unseen.push(pivotIdx);
-    hi=Math.min(hi,sorted.length);lo=Math.min(lo,sorted.length);
-    ask();
-  }
 }
 function undoPick(){
   if(history.length===0)return;
   var h=history.pop();
-  sorted=h.sorted;queue=h.queue;current=h.current;lo=h.lo;hi=h.hi;qNum=h.qNum;unseen=h.unseen;
-  if(history.length===0)document.getElementById('undo-btn').style.display='none';
-  show('s-quiz');ask();
+  sorted=h.sorted;queue=h.queue;current=h.current;lo=h.lo;hi=h.hi;qNum=h.qNum;
+  if(history.length===0)document.getElementById("undo-btn").style.display="none";
+  show("s-quiz");ask();
 }
 function showPartial(){
   var partial=sorted.slice();if(current>=0)partial.push(current);queue.forEach(function(q){partial.push(q);});
   buildResults(partial,false);
-  document.getElementById('continue-btn').style.display='';
-  show('s-res');
+  document.getElementById("continue-btn").style.display="";
+  show("s-res");
 }
 function continueQuiz(){
-  document.getElementById('continue-btn').style.display='none';
-  show('s-quiz');ask();
+  document.getElementById("continue-btn").style.display="none";
+  show("s-quiz");ask();
 }
 function showResults(complete){
   buildResults(sorted,complete);
-  if(!complete)document.getElementById('continue-btn').style.display='';
-  show('s-res');
+  if(!complete)document.getElementById("continue-btn").style.display="";
+  show("s-res");
 }
 function buildResults(list,complete){
-  var watched=list.filter(function(i){return unseen.indexOf(i)===-1;});
-  var skippedNote=unseen.length?' '+unseen.length+' skipped.':'';
-  document.getElementById('res-meta').textContent=complete
-    ?(watched.length+' ranked.'+skippedNote)
-    :('Partial — '+queue.length+' still to place.'+skippedNote);
-  var el=document.getElementById('res-list');el.innerHTML='';
-  watched.forEach(function(idx,rank){
-    var item=ITEMS[idx];var row=document.createElement('div');row.className='r-row';
-    var nc=rank<10?'r-num gold':'r-num';
-    row.innerHTML='<div class="'+nc+'">'+(rank+1)+'</div><div class="r-emoji">'+item.e+'</div><div class="r-name">'+item.n+'</div><div class="r-detail">'+item.d+'</div>';
+  document.getElementById("res-meta").textContent=complete?(list.length+" ranked."):("Partial - "+queue.length+" still to place.");
+  var el=document.getElementById("res-list");el.innerHTML="";
+  list.forEach(function(idx,rank){
+    var item=ITEMS[idx];var row=document.createElement("div");row.className="r-row";
+    var nc=rank<10?"r-num gold":"r-num";
+    row.innerHTML="<div class=\""+nc+"\">"+(rank+1)+"</div><div class=\"r-emoji\">"+item.e+"</div><div class=\"r-name\">"+item.n+"</div><div class=\"r-detail\">"+item.d+"</div>";
     el.appendChild(row);
   });
-  if(unseen.length>0){
-    var div=document.createElement('div');
-    div.style.cssText='margin:20px 0 8px;padding-top:16px;border-top:1px solid var(--b1);';
-    var label=document.createElement('div');
-    label.style.cssText='font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);font-weight:500;margin-bottom:10px';
-    label.textContent=`Haven't Watched`;
-    div.appendChild(label);el.appendChild(div);
-    unseen.forEach(function(idx){
-      var item=ITEMS[idx];var row=document.createElement('div');row.className='r-row';
-      row.innerHTML='<div class="r-num" style="color:var(--mu);font-size:16px">—</div><div class="r-emoji" style="opacity:.4">'+item.e+'</div><div class="r-name" style="color:var(--mu2)">'+item.n+'</div><div class="r-detail">'+item.d+'</div>';
-      el.appendChild(row);
-    });
-  }
 }
-function getSaves(){try{return JSON.parse(localStorage.getItem('tg_saves_'+RANKER_KEY)||'[]');}catch(e){return[];}}
-function putSaves(arr){localStorage.setItem('tg_saves_'+RANKER_KEY,JSON.stringify(arr));}
+function getSaves(){try{return JSON.parse(localStorage.getItem("tg_saves_"+RANKER_KEY)||"[]");}catch(e){return[];}}
+function putSaves(arr){localStorage.setItem("tg_saves_"+RANKER_KEY,JSON.stringify(arr));}
 function saveRanking(){
-  var name=document.getElementById('save-name-input').value.trim()||
-    new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-  var rows=document.querySelectorAll('#res-list .r-row');
+  var name=document.getElementById("save-name-input").value.trim()||new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+  var rows=document.querySelectorAll("#res-list .r-row");
   var items=[];
   rows.forEach(function(row){
-    var nameEl=row.querySelector('.r-name');var numEl=row.querySelector('.r-num');var emojiEl=row.querySelector('.r-emoji');
-    if(nameEl&&numEl&&numEl.textContent.indexOf('—')===-1)
-      items.push({rank:parseInt(numEl.textContent)||0,name:nameEl.textContent.trim(),emoji:emojiEl?emojiEl.textContent.trim():''});
+    var nameEl=row.querySelector(".r-name");var numEl=row.querySelector(".r-num");var emojiEl=row.querySelector(".r-emoji");
+    if(nameEl&&numEl)items.push({rank:parseInt(numEl.textContent)||0,name:nameEl.textContent.trim(),emoji:emojiEl?emojiEl.textContent.trim():""});
   });
   if(items.length===0)return;
   var saves=getSaves();
-  saves.unshift({id:Date.now(),name:name,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),items:items});
+  saves.unshift({id:Date.now(),name:name,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),items:items});
   putSaves(saves);
-  document.getElementById('save-name-input').value='';
-  var btn=document.getElementById('save-ranking-btn');
-  btn.textContent='✓ Saved!';btn.style.color='var(--green)';
-  setTimeout(function(){btn.textContent='Save Ranking';btn.style.color='';},1800);
+  document.getElementById("save-name-input").value="";
+  var btn=document.getElementById("save-ranking-btn");
+  btn.textContent="Saved!";btn.style.color="var(--green)";
+  setTimeout(function(){btn.textContent="Save Ranking";btn.style.color="";},1800);
 }
-function openSavedModal(){renderSavedModal();document.getElementById('saved-modal-bg').classList.add('open');}
-function closeSavedModal(){document.getElementById('saved-modal-bg').classList.remove('open');}
-document.getElementById('saved-modal-bg').addEventListener('click',function(e){if(e.target===e.currentTarget)closeSavedModal();});
+function openSavedModal(){renderSavedModal();document.getElementById("saved-modal-bg").classList.add("open");}
+function closeSavedModal(){document.getElementById("saved-modal-bg").classList.remove("open");}
+document.getElementById("saved-modal-bg").addEventListener("click",function(e){if(e.target===e.currentTarget)closeSavedModal();});
 function deleteSave(id){putSaves(getSaves().filter(function(s){return s.id!==id;}));renderSavedModal();}
 function renderSavedModal(){
-  var saves=getSaves();var body=document.getElementById('saved-modal-body');
-  if(saves.length===0){body.innerHTML='<div class="no-saves">No saved rankings yet.</div>';return;}
-  var html='';
+  var saves=getSaves();var body=document.getElementById("saved-modal-body");
+  if(saves.length===0){body.innerHTML="<div class=\"no-saves\">No saved rankings yet.</div>";return;}
+  var html2="";
   saves.forEach(function(s){
-    html+='<div class="saved-entry"><div class="saved-entry-hdr"><div><div class="saved-entry-name">'+s.name+'</div><div class="saved-entry-date">'+s.date+'</div></div><button class="saved-entry-del" onclick="deleteSave('+s.id+')">&#215;</button></div><div class="saved-entry-list">';
+    html2+="<div class=\"saved-entry\"><div class=\"saved-entry-hdr\"><div><div class=\"saved-entry-name\">"+s.name+"</div><div class=\"saved-entry-date\">"+s.date+"</div></div><button class=\"saved-entry-del\" onclick=\"deleteSave("+s.id+")\">&#215;</button></div><div class=\"saved-entry-list\">";
     s.items.forEach(function(item){
-      html+='<div class="saved-item-row"><div class="saved-item-num'+(item.rank<=10?' g':'')+'">'+item.rank+'</div>'+(item.emoji?'<span style="font-size:15px">'+item.emoji+'</span>':'')+'<div class="saved-item-name">'+item.name+'</div></div>';
+      html2+="<div class=\"saved-item-row\"><div class=\"saved-item-num"+(item.rank<=10?" g":"")+"\">"+ item.rank+"</div>"+(item.emoji?"<span style=\"font-size:15px\">"+item.emoji+"</span>":"")+"<div class=\"saved-item-name\">"+item.name+"</div></div>";
     });
-    html+='</div></div>';
+    html2+="</div></div>";
   });
-  body.innerHTML=html;
+  body.innerHTML=html2;
 }
-
 </script>
 </body>
 </html>
