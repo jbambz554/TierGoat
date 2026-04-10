@@ -10,13 +10,13 @@
 :root{--bg:#080808;--s1:#111;--s2:#181818;--s3:#222;--b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.14);--b3:rgba(255,255,255,.22);--tx:#efefef;--mu:#5a5a5a;--mu2:#888;--ac:#4ac9e8;--red:#e85a4a;--green:#4acd8d;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;}
-.app{min-height:100vh;display:flex;flex-direction:column;}
+.app{min-height:100vh;}
 .hdr{padding:16px 24px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;gap:14px;}
 .logo-wrap{display:flex;align-items:center;gap:12px;text-decoration:none;}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--ac);}
 .hdr-back{font-size:11px;color:var(--mu);text-decoration:none;letter-spacing:.04em;opacity:.7;}
 .hdr-back:hover{opacity:1;color:var(--tx);}
-.main{flex:1;max-width:560px;margin:0 auto;width:100%;padding:28px 20px 48px;}
+.main{max-width:560px;margin:0 auto;width:100%;padding:28px 20px 48px;}
 .screen{display:none;flex-direction:column;}
 .screen.active{display:flex;}
 .h-title{font-family:'Bebas Neue',sans-serif;font-size:50px;line-height:.95;letter-spacing:3px;margin-bottom:10px;}
@@ -92,16 +92,16 @@ html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM S
 .save-input:focus{border-color:var(--ac);}
 .save-input::placeholder{color:var(--mu);}
 
-.man-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:calc(100vh - 220px);overflow-y:auto;}
-.man-item{display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--b2);border-radius:10px;padding:10px 12px;cursor:grab;user-select:none;touch-action:none;}
+.man-list{display:flex;flex-direction:column;gap:4px;margin-bottom:16px;}
+.man-item{display:flex;align-items:center;gap:8px;background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:7px 10px;cursor:grab;user-select:none;touch-action:none;}
 .man-item:active{cursor:grabbing;}
 .man-item.dragging{opacity:.4;border-style:dashed;}
 .man-item.drag-over{border-color:var(--ac);background:var(--s2);}
-.man-rank{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--mu);min-width:28px;text-align:right;line-height:1;}
+.man-rank{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--mu);min-width:24px;text-align:right;line-height:1;}
 .man-rank.gold{color:var(--ac);}
-.man-emoji{font-size:20px;min-width:26px;text-align:center;}
-.man-name{font-size:13px;color:var(--tx);flex:1;}
-.man-handle{font-size:16px;color:var(--mu);padding:0 2px;opacity:.5;}
+.man-emoji{font-size:17px;min-width:22px;text-align:center;}
+.man-name{font-size:12px;color:var(--tx);flex:1;}
+.man-handle{font-size:13px;color:var(--mu);padding:0 2px;opacity:.4;}
 </style>
 </head>
 <body>
@@ -221,7 +221,7 @@ let sorted=[],queue=[],current=-1,lo=0,hi=0,qNum=0,history=[],unseen=[];
 
 function mxQ(n){let t=0;for(let i=2;i<=n;i++)t+=Math.ceil(Math.log2(i));return t;}
 function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
-function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
 
 function startQuiz(){
   const ix=SHOWS.map((_,i)=>i);shuf(ix);
@@ -335,7 +335,22 @@ function renderManual(){
     row.draggable=true;
     row.dataset.idx=idx;
     var rankCls=rank<10?'man-rank gold':'man-rank';
-    row.innerHTML='<div class="man-handle">&#8801;</div><div class="'+rankCls+'">'+(rank+1)+'</div><div class="man-emoji">'+item.e+'</div><div class="man-name">'+item.n+'</div>';
+    row.innerHTML='<div class="man-handle">&#8801;</div><div class="'+rankCls+'">'+(rank+1)+'</div><div class="man-emoji">'+item.e+'
+
+<div class="screen" id="s-manual">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span class="q-lbl" style="font-size:22px">Manual Ranking</span><span style="font-size:11px;color:var(--mu)">Drag to reorder</span></div>
+  <div class="man-list" id="man-list"></div>
+  <div class="save-name-row">
+    <input class="save-input" id="man-save-input" placeholder="Name this ranking&#8230;" maxlength="40">
+    <button class="save-btn" id="man-save-btn" onclick="saveManual()">Save Ranking</button>
+  </div>
+  <div class="btn-row" style="margin-top:8px">
+    <button class="btn btn-p" onclick="startManual()">Reset Order</button>
+    <button class="btn btn-g" onclick="show('s-home')">Back</button>
+  </div>
+</div>
+
+</div><div class="man-name">'+item.n+'</div>';
     row.addEventListener('dragstart',function(){dragSrc=this;this.classList.add('dragging');});
     row.addEventListener('dragend',function(){this.classList.remove('dragging');document.querySelectorAll('.man-item').forEach(function(r){r.classList.remove('drag-over');});});
     row.addEventListener('dragover',function(e){e.preventDefault();this.classList.add('drag-over');});
@@ -384,19 +399,6 @@ function saveManual(){
 </script>
 
 <!-- SAVED RANKINGS MODAL -->
-
-<div class="screen" id="s-manual">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span class="q-lbl" style="font-size:22px">Manual Ranking</span><span style="font-size:11px;color:var(--mu)">Drag to reorder</span></div>
-  <div class="man-list" id="man-list"></div>
-  <div class="save-name-row">
-    <input class="save-input" id="man-save-input" placeholder="Name this ranking&#8230;" maxlength="40">
-    <button class="save-btn" id="man-save-btn" onclick="saveManual()">Save Ranking</button>
-  </div>
-  <div class="btn-row" style="margin-top:8px">
-    <button class="btn btn-p" onclick="startManual()">Reset Order</button>
-    <button class="btn btn-g" onclick="show('s-home')">Back</button>
-  </div>
-</div>
 <div class="saved-modal-bg" id="saved-modal-bg">
   <div class="saved-modal">
     <div class="saved-modal-hdr">
