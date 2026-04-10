@@ -58,6 +58,16 @@
 .saved-item-row{display:flex;gap:8px;align-items:center;padding:4px 0;font-size:12px;border-bottom:.5px solid var(--b1);}.saved-item-row:last-child{border-bottom:none;}
 .saved-item-num{font-family:'Bebas Neue',sans-serif;font-size:16px;min-width:24px;text-align:right;color:var(--mu);}.saved-item-num.g{color:var(--ac);}
 .saved-item-name{flex:1;color:var(--tx);}.no-saves{color:var(--mu);font-size:13px;text-align:center;padding:24px 0;}
+.man-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:calc(100vh - 220px);overflow-y:auto;}
+.man-item{display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--b2);border-radius:10px;padding:10px 12px;cursor:grab;user-select:none;touch-action:none;}
+.man-item:active{cursor:grabbing;}
+.man-item.dragging{opacity:.4;border-style:dashed;}
+.man-item.drag-over{border-color:var(--ac);background:var(--s2);}
+.man-rank{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--mu);min-width:28px;text-align:right;line-height:1;}
+.man-rank.gold{color:var(--ac);}
+.man-emoji{font-size:20px;min-width:26px;text-align:center;}
+.man-name{font-size:13px;color:var(--tx);flex:1;}
+.man-handle{font-size:16px;color:var(--mu);padding:0 2px;opacity:.5;}
 </style>
 </head>
 <body>
@@ -86,7 +96,8 @@
   <div class="h-title">Best Current<br><em>NFL</em><br>Running Backs</div>
   <p class="h-desc">Every contender in the backfield. Who is the best RB right now?</p>
   <p class="h-meta"><span>38 running backs</span></p>
-  <div class="btn-row"><button class="btn btn-p" onclick="startQuiz()">Start Ranking</button></div>
+  <div class="btn-row"><button class="btn btn-p" onclick="startQuiz()">Head-to-Head</button></div>
+  <div class="btn-row" style="margin-top:8px"><button class="save-btn" style="border-color:var(--ac);color:var(--ac);opacity:.85" onclick="startManual()">Manually Rank</button></div>
   <div class="btn-row" style="margin-top:10px"><button class="save-btn" onclick="openSavedModal()">View Saved Rankings</button></div>
 </div>
 <div class="screen" id="s-quiz">
@@ -111,6 +122,7 @@
   </div>
   <div class="btn-row">
     <button class="btn btn-g btn-sm" onclick="showPartial()">See ranking so far</button>
+    <button class="btn btn-g btn-sm" onclick="startManual()">Manually Rank</button>
   </div>
 </div>
 <div class="screen" id="s-res">
@@ -126,6 +138,19 @@
     <button class="btn btn-g" id="continue-btn" style="display:none" onclick="continueQuiz()">Keep going</button>
   </div>
 </div>
+</div>
+
+<div class="screen" id="s-manual">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span class="q-lbl" style="font-size:22px">Manual Ranking</span><span style="font-size:11px;color:var(--mu)">Drag to reorder</span></div>
+  <div class="man-list" id="man-list"></div>
+  <div class="save-name-row">
+    <input class="save-input" id="man-save-input" placeholder="Name this ranking&#8230;" maxlength="40">
+    <button class="save-btn" id="man-save-btn" onclick="saveManual()">Save Ranking</button>
+  </div>
+  <div class="btn-row" style="margin-top:8px">
+    <button class="btn btn-p" onclick="startManual()">Reset Order</button>
+    <button class="btn btn-g" onclick="show('s-home')">Back</button>
+  </div>
 </div>
 </div>
 <div class="saved-modal-bg" id="saved-modal-bg">
@@ -282,6 +307,85 @@ function renderSavedModal(){
     html2+="</div></div>";
   });
   body.innerHTML=html2;
+}
+
+var manOrder=[];
+var dragSrc=null;
+
+function startManual(){
+  var ix=ITEMS.map(function(_,i){return i;});
+  manOrder=ix;
+  renderManual();
+  show("s-manual");
+}
+
+function renderManual(){
+  var el=document.getElementById("man-list");
+  el.innerHTML="";
+  manOrder.forEach(function(idx,rank){
+    var item=ITEMS[idx];
+    var row=document.createElement("div");
+    row.className="man-item";
+    row.draggable=true;
+    row.dataset.idx=idx;
+    var rankCls=rank<10?"man-rank gold":"man-rank";
+    row.innerHTML='<div class="man-handle">&#8801;</div><div class="'+rankCls+'">'+(rank+1)+'</div><div class="man-emoji">'+item.e+'</div><div class="man-name">'+item.n+'</div>';
+    // Desktop drag
+    row.addEventListener("dragstart",function(){dragSrc=this;this.classList.add("dragging");});
+    row.addEventListener("dragend",function(){this.classList.remove("dragging");document.querySelectorAll(".man-item").forEach(function(r){r.classList.remove("drag-over");});});
+    row.addEventListener("dragover",function(e){e.preventDefault();this.classList.add("drag-over");});
+    row.addEventListener("dragleave",function(){this.classList.remove("drag-over");});
+    row.addEventListener("drop",function(e){
+      e.preventDefault();this.classList.remove("drag-over");
+      if(dragSrc===this)return;
+      var fromIdx=manOrder.indexOf(parseInt(dragSrc.dataset.idx));
+      var toIdx=manOrder.indexOf(parseInt(this.dataset.idx));
+      manOrder.splice(toIdx,0,manOrder.splice(fromIdx,1)[0]);
+      renderManual();
+    });
+    // Touch drag
+    row.addEventListener("touchstart",function(e){dragSrc=this;this.classList.add("dragging");},{ passive:true });
+    row.addEventListener("touchmove",function(e){
+      e.preventDefault();
+      var touch=e.touches[0];
+      var target=document.elementFromPoint(touch.clientX,touch.clientY);
+      if(target){
+        var item=target.closest(".man-item");
+        if(item&&item!==dragSrc){
+          document.querySelectorAll(".man-item").forEach(function(r){r.classList.remove("drag-over");});
+          item.classList.add("drag-over");
+        }
+      }
+    },{ passive:false });
+    row.addEventListener("touchend",function(e){
+      this.classList.remove("dragging");
+      var over=document.querySelector(".man-item.drag-over");
+      if(over&&over!==dragSrc){
+        var fromIdx=manOrder.indexOf(parseInt(dragSrc.dataset.idx));
+        var toIdx=manOrder.indexOf(parseInt(over.dataset.idx));
+        manOrder.splice(toIdx,0,manOrder.splice(fromIdx,1)[0]);
+        over.classList.remove("drag-over");
+        renderManual();
+      }
+      document.querySelectorAll(".man-item").forEach(function(r){r.classList.remove("drag-over");});
+    });
+    el.appendChild(row);
+  });
+}
+
+function saveManual(){
+  var name=document.getElementById("man-save-input").value.trim()||
+    new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+  var items=manOrder.map(function(idx,rank){
+    return {rank:rank+1,name:ITEMS[idx].n,emoji:ITEMS[idx].e};
+  });
+  var saves=getSaves();
+  saves.unshift({id:Date.now(),name:name,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),items:items});
+  putSaves(saves);
+  document.getElementById("man-save-input").value="";
+  var btn=document.getElementById("man-save-btn");
+  btn.textContent="Saved!";btn.style.color="var(--green)";
+  setTimeout(function(){btn.textContent="Save Ranking";btn.style.color="";},1800);
 }
 </script>
 </body>

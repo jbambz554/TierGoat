@@ -38,6 +38,7 @@ nav{
   margin-bottom:28px;
 }
 .hero-title em{color:var(--ac);font-style:normal;}
+.hero-goat{font-size:52px;display:block;margin-bottom:16px;line-height:1;}
 .hero-desc{
   font-size:16px;color:var(--mu2);line-height:1.75;
   max-width:520px;margin-bottom:48px;
@@ -90,6 +91,20 @@ nav{
 .cat-card.coming-soon:hover{transform:none;background:var(--s1);border-color:var(--b1);}
 .cat-card.coming-soon::before{display:none;}
 
+/* MOBILE */
+@media(max-width:640px){
+  nav{padding:14px 20px;}
+  .nav-tagline{display:none;}
+  .hero{padding:36px 20px 32px;}
+  .hero-eyebrow{font-size:10px;margin-bottom:12px;}
+  .hero-title{font-size:52px;line-height:.92;margin-bottom:16px;}
+  .hero-goat{font-size:36px;display:inline;margin-right:10px;vertical-align:middle;}
+  .hero-desc{font-size:14px;margin-bottom:32px;}
+  .section-label{padding:0 20px 16px;}
+  .grid{padding:0 20px 48px;grid-template-columns:1fr;}
+  footer{padding:20px;}
+}
+
 /* FOOTER */
 footer{
   border-top:1px solid var(--b1);padding:24px 32px;
@@ -126,10 +141,49 @@ footer{
 
 <section class="hero">
   <div class="hero-eyebrow">The Ultimate Ranking Experience</div>
-  <h1 class="hero-title">Who's Your<br><em>GOAT?</em></h1>
-  <div style="font-size:52px;margin-bottom:16px;line-height:1;">🐐</div>
+  <h1 class="hero-title"><span class="hero-goat">🐐</span>Who's Your<br><em>GOAT?</em></h1>
   <p class="hero-desc">Head-to-head matchups that build your definitive personal rankings across sports, music, film, and more. No ads. No aggregates. Just your picks.</p>
 </section>
+
+<div class="section-label">
+  <span>Featured</span><hr>
+</div>
+
+<div class="grid">
+
+  <a class="cat-card active-card" href="nba.html">
+    <div class="cat-icon">🏀</div>
+    <div class="cat-label">NBA · All-Time</div>
+    <div class="cat-title">NBA All-Time Top 50</div>
+    <div class="cat-desc">Rank the greatest at each position, then build your personal all-time top 50.</div>
+    <div class="cat-badge badge-live">Live</div>
+  </a>
+
+  <a class="cat-card active-card" href="sitcoms.html">
+    <div class="cat-icon">📺</div>
+    <div class="cat-label">Television</div>
+    <div class="cat-title">Best Sitcoms of the 21st Century</div>
+    <div class="cat-desc">From The Office to Abbott Elementary: Rank the greatest comedies of the modern era.</div>
+    <div class="cat-badge badge-live">Live</div>
+  </a>
+
+  <a class="cat-card active-card" href="cuisines.html">
+    <div class="cat-icon">🌍</div>
+    <div class="cat-label">Food</div>
+    <div class="cat-title">Best Cultural Cuisines</div>
+    <div class="cat-desc">Italian vs Japanese vs Mexican vs Korean: Rank the world's greatest culinary traditions.</div>
+    <div class="cat-badge badge-live">Live</div>
+  </a>
+
+  <a class="cat-card active-card" href="pizza.html">
+    <div class="cat-icon">🍕</div>
+    <div class="cat-label">Food</div>
+    <div class="cat-title">Best Pizza Toppings</div>
+    <div class="cat-desc">Pepperoni vs Pineapple vs Good Ol' Cheese: Rank every topping head-to-head.</div>
+    <div class="cat-badge badge-live">Live</div>
+  </a>
+
+</div>
 
 <div class="section-label">
   <span>Sports</span><hr>
