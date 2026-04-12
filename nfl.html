@@ -189,29 +189,29 @@ html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'DM S
   <div class="res-meta" id="res-meta"></div>
   <div id="res-list"></div>
   <div class="save-name-row" style="margin-top:20px">
-    <input class="save-input" id="save-name-input" placeholder="Name this ranking (optional)…" maxlength="40">
+    <input class="save-input" id="save-name-input" placeholder="Name this ranking&#8230;" maxlength="40">
     <button class="save-btn" id="save-ranking-btn" onclick="saveRanking()">Save Ranking</button>
   </div>
-  <div class="btn-row">
+  <div class="btn-row" style="margin-top:8px">
     <button class="btn btn-p" onclick="startQuiz()">Start Over</button>
     <button class="btn btn-g" id="continue-btn" style="display:none" onclick="continueQuiz()">Keep going</button>
   </div>
 </div>
 
-</div>
+<div class="screen" id="s-manual">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span class="q-lbl" style="font-size:22px">Manual Ranking</span><span style="font-size:11px;color:var(--mu)">Drag to reorder</span></div>
+  <div class="man-list" id="man-list"></div>
+  <div class="save-name-row">
+    <input class="save-input" id="man-save-input" placeholder="Name this ranking&#8230;" maxlength="40">
+    <button class="save-btn" id="man-save-btn" onclick="saveManual()">Save Ranking</button>
+  </div>
+  <div class="btn-row" style="margin-top:8px">
+    <button class="btn btn-p" onclick="startManual()">Reset Order</button>
+    <button class="btn btn-g" onclick="show('s-home')">Back</button>
+  </div>
 </div>
 
-<!-- COMPARE MODAL -->
-<div class="modal-bg" id="modal-bg">
-  <div class="modal">
-    <div class="modal-hdr">
-      <div class="modal-title">Player Comparison</div>
-      <button class="modal-close" onclick="closeCompare()">&#215;</button>
-    </div>
-    <div class="cmp-grid" id="cmp-grid"></div>
-    <div id="cmp-acc-a" class="acc-sec"></div>
-    <div id="cmp-acc-b" class="acc-sec"></div>
-  </div>
+</div>
 </div>
 
 <script>
@@ -246,15 +246,13 @@ const QBS = [
   {n:'Eli Manning',       d:'2004–2019',   s:{yds:57023,td:366,int:244,rate:84.1},ac:['2× Super Bowl Champion','2× Super Bowl MVP','4× Pro Bowl','210 consecutive starts (3rd all-time)','2 upsets of undefeated Patriots dynasties']},
 ];
 
-let sorted=[],queue=[],current=-1,lo=0,hi=0,qNum=0,history=[];
-
 function mxQ(n){let t=0;for(let i=2;i<=n;i++)t+=Math.ceil(Math.log2(i));return t;}
 function shuf(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
 
 function startQuiz(){
   const ix=QBS.map((_,i)=>i);shuf(ix);
-  sorted=[ix[0]];queue=ix.slice(1);current=-1;qNum=0;history=[];
+  sorted=[ix[0]];queue=ix.slice(1);current=-1;qNum=0;moveHistory=[];
   document.getElementById('undo-btn').style.display='none';
   show('s-quiz');nextInsertion();
 }
@@ -276,17 +274,17 @@ function ask(){
   document.getElementById('qpf').style.width=pct+'%';
 }
 function pick(ch){
-  history.push({sorted:[...sorted],queue:[...queue],current,lo,hi,qNum});
+  moveHistory.push({sorted:[...sorted],queue:[...queue],current,lo,hi,qNum});
   document.getElementById('undo-btn').style.display='';
   const mid=Math.floor((lo+hi)/2);
   if(ch==='hi')hi=mid;else lo=mid+1;
   ask();
 }
 function undoPick(){
-  if(history.length===0)return;
-  const h=history.pop();
+  if(moveHistory.length===0)return;
+  const h=moveHistory.pop();
   sorted=h.sorted;queue=h.queue;current=h.current;lo=h.lo;hi=h.hi;qNum=h.qNum;
-  if(history.length===0)document.getElementById('undo-btn').style.display='none';
+  if(moveHistory.length===0)document.getElementById('undo-btn').style.display='none';
   show('s-quiz');ask();
 }
 function showPartial(){
@@ -317,244 +315,67 @@ function buildResults(list,complete){
   });
 }
 
-// Compare modal
-function openCompare(){
-  const mid=Math.floor((lo+hi)/2);
-  const a=QBS[current],b=QBS[sorted[mid]];
-  renderModal(a,b);
-}
-function renderModal(a,b){
-  const stats=[
-    {k:'yds',l:'Pass Yards'},
-    {k:'td',l:'Touchdowns'},
-    {k:'int',l:'Interceptions'},
-    {k:'rate',l:'Passer Rating'},
-  ];
-  const grid=document.getElementById('cmp-grid');grid.innerHTML='';
-  [a,b].forEach((p,ci)=>{
-    const col=document.createElement('div');col.className='cmp-col';
-    let rows='';
-    stats.forEach(st=>{
-      const va=a.s[st.k],vb=b.s[st.k];
-      // always show all stats
-      const val=ci===0?(va!==null?va.toLocaleString():'N/A'):(vb!==null?vb.toLocaleString():'N/A');
-      const vNum=ci===0?va:vb,oNum=ci===0?vb:va;
-      // For interceptions, lower is better
-      const isInt=st.k==='int';
-      const hi=vNum!==null&&oNum!==null&&(isInt?vNum<oNum:vNum>oNum)?'hi':'';
-      rows+=`<div class="stat-row"><span class="stat-lbl">${st.l}</span><span class="stat-val ${hi}">${val}</span></div>`;
-    });
-    col.innerHTML=`<div class="cmp-pname">${p.n}</div><div class="cmp-era">${p.d}</div>${rows}`;
-    grid.appendChild(col);
-  });
-  ['a','b'].forEach((side,ci)=>{
-    const p=ci===0?a:b;
-    const sec=document.getElementById('cmp-acc-'+side);
-    sec.innerHTML=`<div class="acc-title">${p.n} — Accolades</div>${p.ac.map(x=>`<span class="acc-tag">${x}</span>`).join('')}`;
-  });
-  document.getElementById('modal-bg').classList.add('open');
-}
-function closeCompare(){document.getElementById('modal-bg').classList.remove('open');}
-document.getElementById('modal-bg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeCompare();});
-
-var manOrder=[];
-var dragSrc=null;
-function startManual(){
-  manOrder=ITEMS.map(function(_,i){return i;});
-  renderManual();
-  show('s-manual');
-}
-function renderManual(){
-  var el=document.getElementById('man-list');
-  el.innerHTML='';
-  manOrder.forEach(function(idx,rank){
-    var item=ITEMS[idx];
-    var row=document.createElement('div');
-    row.className='man-item';
-    row.draggable=true;
-    row.dataset.idx=idx;
-    var rankCls=rank<10?'man-rank gold':'man-rank';
-    row.innerHTML='<div class="man-handle">&#8801;</div><div class="'+rankCls+'">'+(rank+1)+'</div><div class="man-emoji">'+item.e+'
-
-<div class="screen" id="s-manual">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span class="q-lbl" style="font-size:22px">Manual Ranking</span><span style="font-size:11px;color:var(--mu)">Drag to reorder</span></div>
-  <div class="man-list" id="man-list"></div>
-  <div class="save-name-row">
-    <input class="save-input" id="man-save-input" placeholder="Name this ranking&#8230;" maxlength="40">
-    <button class="save-btn" id="man-save-btn" onclick="saveManual()">Save Ranking</button>
-  </div>
-  <div class="btn-row" style="margin-top:8px">
-    <button class="btn btn-p" onclick="startManual()">Reset Order</button>
-    <button class="btn btn-g" onclick="show('s-home')">Back</button>
-  </div>
-</div>
-
-</div><div class="man-name">'+item.n+'</div>';
-    row.addEventListener('dragstart',function(){dragSrc=this;this.classList.add('dragging');});
-    row.addEventListener('dragend',function(){this.classList.remove('dragging');document.querySelectorAll('.man-item').forEach(function(r){r.classList.remove('drag-over');});});
-    row.addEventListener('dragover',function(e){e.preventDefault();this.classList.add('drag-over');});
-    row.addEventListener('dragleave',function(){this.classList.remove('drag-over');});
-    row.addEventListener('drop',function(e){
-      e.preventDefault();this.classList.remove('drag-over');
-      if(dragSrc===this)return;
-      var fromIdx=manOrder.indexOf(parseInt(dragSrc.dataset.idx));
-      var toIdx=manOrder.indexOf(parseInt(this.dataset.idx));
-      manOrder.splice(toIdx,0,manOrder.splice(fromIdx,1)[0]);
-      renderManual();
-    });
-    row.addEventListener('touchstart',function(e){dragSrc=this;this.classList.add('dragging');},{passive:true});
-    row.addEventListener('touchmove',function(e){
-      e.preventDefault();
-      var touch=e.touches[0];
-      var target=document.elementFromPoint(touch.clientX,touch.clientY);
-      if(target){var item=target.closest('.man-item');if(item&&item!==dragSrc){document.querySelectorAll('.man-item').forEach(function(r){r.classList.remove('drag-over');});item.classList.add('drag-over');}}
-    },{passive:false});
-    row.addEventListener('touchend',function(e){
-      this.classList.remove('dragging');
-      var over=document.querySelector('.man-item.drag-over');
-      if(over&&over!==dragSrc){
-        var fromIdx=manOrder.indexOf(parseInt(dragSrc.dataset.idx));
-        var toIdx=manOrder.indexOf(parseInt(over.dataset.idx));
-        manOrder.splice(toIdx,0,manOrder.splice(fromIdx,1)[0]);
-        over.classList.remove('drag-over');
-        renderManual();
-      }
-      document.querySelectorAll('.man-item').forEach(function(r){r.classList.remove('drag-over');});
-    });
-    el.appendChild(row);
-  });
-}
-function saveManual(){
-  var name=document.getElementById('man-save-input').value.trim()||new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-  var items=manOrder.map(function(idx,rank){return {rank:rank+1,name:ITEMS[idx].n,emoji:ITEMS[idx].e};});
-  var saves=getSaves();
-  saves.unshift({id:Date.now(),name:name,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),items:items});
-  putSaves(saves);
-  document.getElementById('man-save-input').value='';
-  var btn=document.getElementById('man-save-btn');
-  btn.textContent='Saved!';btn.style.color='var(--green)';
-  setTimeout(function(){btn.textContent='Save Ranking';btn.style.color='';},1800);
-}
-</script>
-
-<!-- SAVED RANKINGS MODAL -->
-<div class="saved-modal-bg" id="saved-modal-bg">
-  <div class="saved-modal">
-    <div class="saved-modal-hdr">
-      <div class="saved-modal-title">Saved Rankings</div>
-      <button class="saved-modal-close" onclick="closeSavedModal()">&#215;</button>
-    </div>
-    <div class="saved-modal-body" id="saved-modal-body"></div>
-  </div>
-</div>
-
-<script>
 const RANKER_KEY = 'nfl';
-
-// ── SAVE SYSTEM ──────────────────────────────────────────────────────────────
-function getSaves() {
-  try { return JSON.parse(localStorage.getItem('tg_saves_' + RANKER_KEY) || '[]'); }
-  catch(e) { return []; }
-}
-function putSaves(arr) {
-  localStorage.setItem('tg_saves_' + RANKER_KEY, JSON.stringify(arr));
-}
-
-function saveRanking() {
-  const name = document.getElementById('save-name-input').value.trim() ||
-    new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-  // Collect the current displayed ranking from the results list
-  const rows = document.querySelectorAll('#res-list .r-row');
-  const items = [];
-  rows.forEach(row => {
-    const nameEl = row.querySelector('.r-name');
-    const numEl  = row.querySelector('.r-num');
-    const emojiEl = row.querySelector('.r-emoji');
-    if (nameEl && numEl && !numEl.textContent.includes('—')) {
-      items.push({
-        rank: parseInt(numEl.textContent) || 0,
-        name: nameEl.textContent.trim(),
-        emoji: emojiEl ? emojiEl.textContent.trim() : ''
-      });
-    }
+function getSaves(){try{return JSON.parse(localStorage.getItem('tg_saves_'+RANKER_KEY)||'[]');}catch(e){return[];}}
+function putSaves(arr){localStorage.setItem('tg_saves_'+RANKER_KEY,JSON.stringify(arr));}
+function saveRanking(){
+  const name=document.getElementById('save-name-input').value.trim()||new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const rows=document.querySelectorAll('#res-list .r-row');
+  const items=[];
+  rows.forEach(function(row){
+    const nameEl=row.querySelector('.r-name');const numEl=row.querySelector('.r-num');const emojiEl=row.querySelector('.r-emoji');
+    if(nameEl&&numEl&&numEl.textContent.indexOf('—')===-1)
+      items.push({rank:parseInt(numEl.textContent)||0,name:nameEl.textContent.trim(),emoji:emojiEl?emojiEl.textContent.trim():''});
   });
-  if (items.length === 0) return;
-  const saves = getSaves();
-  saves.unshift({
-    id: Date.now(),
-    name,
-    date: new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
-    items
-  });
+  if(items.length===0)return;
+  const saves=getSaves();
+  saves.unshift({id:Date.now(),name:name,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),items:items});
   putSaves(saves);
-  document.getElementById('save-name-input').value = '';
-  const btn = document.getElementById('save-ranking-btn');
-  btn.textContent = '✓ Saved!';
-  btn.style.color = 'var(--green)';
-  setTimeout(() => { btn.textContent = 'Save Ranking'; btn.style.color = ''; }, 1800);
+  document.getElementById('save-name-input').value='';
+  const btn=document.getElementById('save-ranking-btn');
+  btn.textContent='Saved!';btn.style.color='var(--green)';
+  setTimeout(function(){btn.textContent='Save Ranking';btn.style.color='';},1800);
+}
+function openSavedModal(){renderSavedModal();document.getElementById('saved-modal-bg').classList.add('open');}
+function closeSavedModal(){document.getElementById('saved-modal-bg').classList.remove('open');}
+document.getElementById('saved-modal-bg').addEventListener('click',function(e){if(e.target===e.currentTarget)closeSavedModal();});
+function deleteSave(id){putSaves(getSaves().filter(function(s){return s.id!==id;}));renderSavedModal();}
+function renderSavedModal(){
+  const saves=getSaves();const body=document.getElementById('saved-modal-body');
+  if(saves.length===0){body.innerHTML='<div class="no-saves">No saved rankings yet.</div>';return;}
+  let html='';
+  saves.forEach(function(s){
+    html+='<div class="saved-entry"><div class="saved-entry-hdr"><div><div class="saved-entry-name">'+s.name+'</div><div class="saved-entry-date">'+s.date+'</div></div><button class="saved-entry-del" onclick="deleteSave('+s.id+')">&#215;</button></div><div class="saved-entry-list">';
+    s.items.forEach(function(item){
+      html+='<div class="saved-item-row"><div class="saved-item-num'+(item.rank<=10?' g':'')+'">'+item.rank+'</div>'+(item.emoji?'<span style="font-size:15px">'+item.emoji+'</span>':'')+'<div class="saved-item-name">'+item.name+'</div></div>';
+    });
+    html+='</div></div>';
+  });
+  body.innerHTML=html;
 }
 
-function openSavedModal() {
-  renderSavedModal();
-  document.getElementById('saved-modal-bg').classList.add('open');
-}
-function closeSavedModal() {
-  document.getElementById('saved-modal-bg').classList.remove('open');
-}
-document.getElementById('saved-modal-bg').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeSavedModal();
-});
-
-function deleteSave(id) {
-  putSaves(getSaves().filter(s => s.id !== id));
-  renderSavedModal();
-}
-
-function renderSavedModal() {
-  const saves = getSaves();
-  const body = document.getElementById('saved-modal-body');
-  if (saves.length === 0) {
-    body.innerHTML = '<div class="no-saves">No saved rankings yet.<br>Complete a ranking and tap "Save Ranking" to store it here.</div>';
-    return;
-  }
-  body.innerHTML = saves.map(s => `
-    <div class="saved-entry">
-      <div class="saved-entry-hdr">
-        <div>
-          <div class="saved-entry-name">${s.name}</div>
-          <div class="saved-entry-date">${s.date}</div>
-        </div>
-        <button class="saved-entry-del" onclick="deleteSave(${s.id})" title="Delete">&#215;</button>
-      </div>
-      <div class="saved-entry-list">
-        ${s.items.map(item => `
-          <div class="saved-item-row">
-            <div class="saved-item-num ${item.rank <= 10 ? 'g' : ''}">${item.rank}</div>
-            ${item.emoji ? `<span style="font-size:15px">${item.emoji}</span>` : ''}
-            <div class="saved-item-name">${item.name}</div>
-          </div>`).join('')}
-      </div>
-    </div>`).join('');
-}
 
 var manOrder=[];
 var dragSrc=null;
 function startManual(){
-  manOrder=ITEMS.map(function(_,i){return i;});
-  renderManual();
+  var pool=QBS;
+  manOrder=pool.map(function(_,i){return i;});
+  renderManual(pool);
   show('s-manual');
 }
-function renderManual(){
+function renderManual(pool){
   var el=document.getElementById('man-list');
   el.innerHTML='';
   manOrder.forEach(function(idx,rank){
-    var item=ITEMS[idx];
+    var item=pool[idx];if(!item)return;
     var row=document.createElement('div');
-    row.className='man-item';
-    row.draggable=true;
-    row.dataset.idx=idx;
+    row.className='man-item';row.draggable=true;row.dataset.idx=idx;
     var rankCls=rank<10?'man-rank gold':'man-rank';
-    row.innerHTML='<div class="man-handle">&#8801;</div><div class="'+rankCls+'">'+(rank+1)+'</div><div class="man-emoji">'+item.e+'</div><div class="man-name">'+item.n+'</div>';
+    var nm=item.n||'';var em=item.e||'';
+    row.innerHTML='<div class="man-handle">&#8801;</div>'
+      +'<div class="'+rankCls+'">'+(rank+1)+'</div>'
+      +'<div class="man-emoji">'+em+'</div>'
+      +'<div class="man-name">'+nm+'</div>';
     row.addEventListener('dragstart',function(){dragSrc=this;this.classList.add('dragging');});
     row.addEventListener('dragend',function(){this.classList.remove('dragging');document.querySelectorAll('.man-item').forEach(function(r){r.classList.remove('drag-over');});});
     row.addEventListener('dragover',function(e){e.preventDefault();this.classList.add('drag-over');});
@@ -562,27 +383,25 @@ function renderManual(){
     row.addEventListener('drop',function(e){
       e.preventDefault();this.classList.remove('drag-over');
       if(dragSrc===this)return;
-      var fromIdx=manOrder.indexOf(parseInt(dragSrc.dataset.idx));
-      var toIdx=manOrder.indexOf(parseInt(this.dataset.idx));
-      manOrder.splice(toIdx,0,manOrder.splice(fromIdx,1)[0]);
-      renderManual();
+      var fi=manOrder.indexOf(parseInt(dragSrc.dataset.idx));
+      var ti=manOrder.indexOf(parseInt(this.dataset.idx));
+      manOrder.splice(ti,0,manOrder.splice(fi,1)[0]);
+      renderManual(pool);
     });
-    row.addEventListener('touchstart',function(e){dragSrc=this;this.classList.add('dragging');},{passive:true});
+    row.addEventListener('touchstart',function(){dragSrc=this;this.classList.add('dragging');},{passive:true});
     row.addEventListener('touchmove',function(e){
       e.preventDefault();
-      var touch=e.touches[0];
-      var target=document.elementFromPoint(touch.clientX,touch.clientY);
-      if(target){var item=target.closest('.man-item');if(item&&item!==dragSrc){document.querySelectorAll('.man-item').forEach(function(r){r.classList.remove('drag-over');});item.classList.add('drag-over');}}
+      var t=e.touches[0],tgt=document.elementFromPoint(t.clientX,t.clientY);
+      if(tgt){var mi=tgt.closest('.man-item');if(mi&&mi!==dragSrc){document.querySelectorAll('.man-item').forEach(function(r){r.classList.remove('drag-over');});mi.classList.add('drag-over');}}
     },{passive:false});
-    row.addEventListener('touchend',function(e){
+    row.addEventListener('touchend',function(){
       this.classList.remove('dragging');
       var over=document.querySelector('.man-item.drag-over');
       if(over&&over!==dragSrc){
-        var fromIdx=manOrder.indexOf(parseInt(dragSrc.dataset.idx));
-        var toIdx=manOrder.indexOf(parseInt(over.dataset.idx));
-        manOrder.splice(toIdx,0,manOrder.splice(fromIdx,1)[0]);
-        over.classList.remove('drag-over');
-        renderManual();
+        var fi=manOrder.indexOf(parseInt(dragSrc.dataset.idx));
+        var ti=manOrder.indexOf(parseInt(over.dataset.idx));
+        manOrder.splice(ti,0,manOrder.splice(fi,1)[0]);
+        over.classList.remove('drag-over');renderManual(pool);
       }
       document.querySelectorAll('.man-item').forEach(function(r){r.classList.remove('drag-over');});
     });
@@ -590,8 +409,9 @@ function renderManual(){
   });
 }
 function saveManual(){
+  var pool=QBS;
   var name=document.getElementById('man-save-input').value.trim()||new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-  var items=manOrder.map(function(idx,rank){return {rank:rank+1,name:ITEMS[idx].n,emoji:ITEMS[idx].e};});
+  var items=manOrder.map(function(idx,rank){var item=pool[idx]||{};return {rank:rank+1,name:item.n||'',emoji:item.e||''};});
   var saves=getSaves();
   saves.unshift({id:Date.now(),name:name,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),items:items});
   putSaves(saves);
@@ -601,5 +421,6 @@ function saveManual(){
   setTimeout(function(){btn.textContent='Save Ranking';btn.style.color='';},1800);
 }
 </script>
+
 </body>
 </html>
