@@ -272,7 +272,7 @@ function ask(){
   document.getElementById('vdb').textContent=pv.d;
   qNum++;
   const pct=Math.min(97,Math.round((qNum/mxQ(SHOWS.length))*100));
-  document.getElementById('qhint').textContent=`Which show is better? ${queue.length} still to place.`;
+  document.getElementById('qhint').textContent=`Placing ${SHOWS[current].n} — comparing vs. #${mid+1} in your ranking. ${queue.length} ${queue.length!==1?'shows':'show'} still to place.`;
   document.getElementById('qpf').style.width=pct+'%';
 }
 function pick(ch){

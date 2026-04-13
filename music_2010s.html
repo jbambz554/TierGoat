@@ -276,7 +276,7 @@ function ask(){
   document.getElementById('vdb').textContent=pv.d;
   qNum++;
   const pct=Math.min(97,Math.round((qNum/mxQ(ARTISTS.length))*100));
-  document.getElementById('qhint').textContent=`Who defined the 2010s more? ${queue.length} still to place.`;
+  document.getElementById('qhint').textContent=`Placing ${ARTISTS[current].n} — comparing vs. #${mid+1} in your ranking. ${queue.length} ${queue.length!==1?'artists':'artist'} still to place.`;
   document.getElementById('qpf').style.width=pct+'%';
 }
 function pick(ch){

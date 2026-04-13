@@ -287,8 +287,7 @@ function ask(){
   if(imgB&&pv.p)setImgWithFallback(imgB,pv.p,pv.n);else if(imgB)imgB.style.display='none';
   qNum++;
   const pct=Math.min(97,Math.round((qNum/mxQ(ITEMS.length))*100));
-  document.getElementById('qhint').textContent=
-    `Placing "${ins.n}" — comparing vs. #${mid+1} in your ranking. ${queue.length} item${queue.length!==1?'s':''} still to place.`;
+  document.getElementById('qhint').textContent=`Placing ${ITEMS[current].n} — comparing vs. #${mid+1} in your ranking. ${queue.length} ${queue.length!==1?'films':'film'} still to place.`;
   document.getElementById('qpf').style.width=pct+'%';
 }
 

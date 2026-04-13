@@ -240,7 +240,7 @@ function ask(){
   document.getElementById("vdb").textContent=pv.d;
   qNum++;
   var pct=Math.min(97,Math.round((qNum/mxQ(ITEMS.length))*100));
-  document.getElementById("qhint").textContent="Which team is better right now? "+queue.length+" still to place.";
+  document.getElementById("qhint").textContent="Placing "+ins.n+" — comparing vs. #"+(mid+1)+" in your ranking. "+queue.length+" team"+( queue.length!==1?"s":"")+" still to place.";
   document.getElementById("qpf").style.width=pct+"%";
 }
 function pick(ch){
