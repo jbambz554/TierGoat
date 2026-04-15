@@ -106,14 +106,15 @@ nav{
 .cat-card.coming-soon:hover{transform:none;background:var(--s1);border-color:var(--b1);}
 .cat-card.coming-soon::before{display:none;}
 
-/* MOBILE */
+.hero-title br{display:block;}
 @media(max-width:640px){
+  .hero-title br{display:none;}
   nav{padding:14px 20px;}
   .nav-tagline{display:none;}
   .hero{padding:36px 20px 32px;}
   .hero-eyebrow{font-size:10px;margin-bottom:12px;}
-  .hero-title{font-size:clamp(32px,8.5vw,52px);white-space:nowrap;line-height:.92;margin-bottom:16px;}
-  .hero-goat{font-size:clamp(24px,6vw,36px);display:inline;margin-right:8px;vertical-align:middle;}
+  .hero-title{font-size:clamp(28px,7.2vw,52px);white-space:nowrap;line-height:.92;margin-bottom:16px;}
+  .hero-goat{font-size:clamp(22px,5.5vw,36px);display:inline;margin-right:6px;vertical-align:middle;line-height:1;}
   .hero-desc{font-size:14px;margin-bottom:32px;}
   .section-label{padding:0 20px 16px;}
   .grid{padding:0 20px 48px;grid-template-columns:1fr;}
